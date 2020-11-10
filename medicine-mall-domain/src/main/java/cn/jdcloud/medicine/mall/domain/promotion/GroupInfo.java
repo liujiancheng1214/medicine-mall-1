@@ -14,6 +14,7 @@ import java.util.Date;
 @TableName("t_group_info")
 public class GroupInfo {
     private Integer id;
+    private String itemNo;
     private Integer promotionId; //活动规则id
     private Integer plushUserId; //发起人id
     private Integer userNum; //参团人数
