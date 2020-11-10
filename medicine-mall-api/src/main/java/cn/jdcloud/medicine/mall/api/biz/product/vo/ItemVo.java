@@ -18,6 +18,8 @@ import lombok.Data;
 public class ItemVo{
     private Integer id;
     /**商品编码*/
+    @ApiModelProperty(value="ERP_ID")
+    private String erpId;
     @ApiModelProperty(value="商品编码")
     private String itemNo;
     /**商品名字*/
@@ -61,9 +63,6 @@ public class ItemVo{
     /**平台价格*/
     @ApiModelProperty(value="平台价格")
     private BigDecimal platformPrice;
-    /**平台团购价格*/
-    @ApiModelProperty(value="团购价格")
-    private BigDecimal promotionPrice;
     /**生产日期 */
     @JsonFormat(pattern="yyyy-MM-dd",timezone="GMT+8")
     @ApiModelProperty(value="生产日期")
@@ -136,6 +135,9 @@ public class ItemVo{
     /**零售价格*/
     @ApiModelProperty(value="零售价格")
     private BigDecimal retailPrice;
+
+    @ApiModelProperty(value="团购价格")
+    private BigDecimal promotionPrice;
     /**库存周转天数 */
     @ApiModelProperty(value="库存周转天数")
     private Integer revolveDay;
@@ -257,7 +259,7 @@ public class ItemVo{
     	this.imgCover=promotionItemListDto.getImgCover();
     	this.effectiveDate=promotionItemListDto.getEffectiveDate();
     	this.subtotalSaleNum=promotionItemListDto.getSubtotalSaleNum();
-    	this.promotionPrice=promotionItemListDto.getItemGroupPrice();
+        this.promotionPrice=promotionItemListDto.getItemGroupPrice();
     	this.platformPrice=promotionItemListDto.getItemGroupPrice();
     	this.retailPrice=promotionItemListDto.getRetailPrice();
     	this.factory=promotionItemListDto.getFactory();
@@ -330,5 +332,7 @@ public class ItemVo{
         this.lastPurchaseTime = item.getLastPurchaseTime();
         this.lastSaleTime = item.getLastSaleTime();
         this.itemBatch = map.get(this.itemNo);
+        this.platformPrice = item.getPlatformPrice();
+        this.erpId = item.getErpId();
     }
 }
