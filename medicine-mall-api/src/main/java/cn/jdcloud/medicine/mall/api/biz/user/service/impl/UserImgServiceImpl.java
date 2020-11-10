@@ -20,12 +20,6 @@ public class UserImgServiceImpl extends ServiceImpl<UserImgMapper, UserImg> impl
     @Resource
     UserImgMapper userImgMapper;
 
-    @Override
-    public List<UserImg> getAllUserImg(Integer userId) {
-        Map map = new HashMap();
-        map.put("user_id",userId);
-        List<UserImg> userImgs = userImgMapper.selectByMap(map);
-        return userImgs;
-    }
+
 
 }

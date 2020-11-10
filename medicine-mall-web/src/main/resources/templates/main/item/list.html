@@ -200,6 +200,9 @@
                            :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
                     <i-input style="width: 500px" req v-model="newItem.itemName"></i-input>
                 </Form-item>
+                <Form-item label="ERP_ID" prop="erpId">
+                    <i-input style="width: 500px" req v-model="newItem.erpId"></i-input>
+                </Form-item>
                 <Row type="flex" align="middle">
                     <i-col span="7">
                         <Form-item label="商品品牌" prop="itemBrandId">
@@ -268,8 +271,11 @@
             </div>
             <Divider orientation="left" style="font-size: 20px">价格</Divider>
             <div style="padding-left: 50px">
-                <Form-item label="零售价格" prop="retailPrice">
+                <Form-item label="市场价格" prop="retailPrice">
                     <i-input style="width: 500px" v-model="newItem.retailPrice" number></i-input>
+                </Form-item>
+                <Form-item label="平台价格" prop="platformPrice">
+                    <i-input style="width: 500px" v-model="newItem.platformPrice" number></i-input>
                 </Form-item>
                 <Form-item label="起购价格" prop="startPurchaseAmount">
                     <i-input style="width: 500px" number v-model="newItem.startPurchaseAmount"></i-input>

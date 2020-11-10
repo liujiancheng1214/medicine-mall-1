@@ -11,11 +11,5 @@ import java.util.List;
  */
 public interface UserImgService extends IService<UserImg>{
 
-    /**
-     * 查询客户证件图片
-     * @param userId
-     * @return
-     */
-    List<UserImg> getAllUserImg(Integer userId);
 
 }

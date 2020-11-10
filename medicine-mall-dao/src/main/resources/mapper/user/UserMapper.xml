@@ -46,11 +46,11 @@
     </sql>
     <!--连表查询处理外键字段id-->
     <select id="listUser" resultType="cn.jdcloud.medicine.mall.domain.user.UserResult">
-        select tu.*, tr.name
-        as provinceName, tr1.name
-        as cityName, tr2.name
-        as districtName, tul.level_name
-        as userLevelName
+        select tu.*,
+        tr.name as provinceName,
+        tr1.name as cityName,
+        tr2.name as districtName
+        tul.level_name as userLevelName
         from t_user tu
         left join t_region tr on tu.province_id = tr.id
         left join t_region tr1 on tu.city_id = tr1.id

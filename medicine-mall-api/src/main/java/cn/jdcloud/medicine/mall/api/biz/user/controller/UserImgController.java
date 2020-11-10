@@ -3,7 +3,9 @@ package cn.jdcloud.medicine.mall.api.biz.user.controller;
 import cn.jdcloud.framework.core.common.BaseController;
 import cn.jdcloud.framework.core.vo.ApiResult;
 import cn.jdcloud.medicine.mall.api.biz.user.service.UserImgService;
+import cn.jdcloud.medicine.mall.api.biz.user.service.UserService;
 import cn.jdcloud.medicine.mall.domain.user.UserImg;
+import cn.jdcloud.medicine.mall.domain.user.UserImgVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +18,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -31,13 +33,7 @@ import java.util.zip.ZipOutputStream;
 public class UserImgController extends BaseController {
 
     @Resource
-    UserImgService userImgService;
-
-    @ApiOperation(value = "查询用户证件照片")
-    @GetMapping(value = "/getImg")
-    public ApiResult getAllUserImg(Integer userId) {
-        return ApiResult.ok(userImgService.getAllUserImg(userId));
-    }
+    UserService userService;
 
     @ApiOperation(value = "下载用户证件照片(zip文件)")
     @GetMapping(value = "/downLoadImg")
@@ -48,10 +44,10 @@ public class UserImgController extends BaseController {
             response.setContentType("application/octet-stream");// 指明response的返回对象是文件流
             response.setHeader("Content-Disposition", "attachment;filename=" + downloadFilename);// 设置在下载框默认显示的文件名
             ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
-            List<UserImg> fileList = userImgService.getAllUserImg(userId);
-            for (int i = 0; i < fileList.size(); i++) {
-                URL url = new URL(fileList.get(i).getImgUrl());
-                zos.putNextEntry(new ZipEntry(fileList.get(i).getImgRemark() + ".jpg"));
+            Set<UserImgVO> fileSet = userService.getUserImg(userId);
+            for (UserImgVO img:fileSet) {
+                URL url = new URL(img.getImgUrl());
+                zos.putNextEntry(new ZipEntry(img.getImgRemark()));
                 InputStream fis = url.openConnection().getInputStream();
                 byte[] buffer = new byte[1024];
                 int r = 0;

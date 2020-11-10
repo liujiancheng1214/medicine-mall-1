@@ -265,7 +265,7 @@ window.$vue = new Vue({
                                     $vue.userItem.userId = item.id;
                                     $vue.userItem.userName = item.companyName;
                                     $vue.userItem.address = item.contactAddress == "" ? "暂未登记" : item.contactAddress;
-                                    $vue.getImgList(item.id);
+                                    $vue.getImgList(item);
                                 }
                             }
                         }, '查看/下载'), h('p', {
@@ -426,14 +426,26 @@ window.$vue = new Vue({
     },
     components: {},
     methods: {
-        getImgList(userId) { //查询相关证件
-            api.get("/cms/user/img/getImg",
-                {params: {userId: userId,}}
-            ).then((res) => {
-                if (res.data.code === 0) {
-                    this.imgList = res.data.data;
-                }
-            })
+        getImgList(user) { //查询相关证件
+            this.imgList = [];
+            if(user.cgysfsmj != null && user.cgysfsmj != ''){
+                this.imgList.push({"imgUrl":user.cgysfsmj,"imgRemark":"身份证扫描件"})
+            }
+            if(user.cgwtssmj != null && user.cgwtssmj != ''){
+                this.imgList.push({"imgUrl":user.cgwtssmj,"imgRemark":"采购委托书扫描件"})
+            }
+            if(user.yljgzyxkz != null && user.yljgzyxkz != ''){
+                this.imgList.push({"imgUrl":user.yljgzyxkz,"imgRemark":"医疗机构执业许可证"})
+            }
+            if(user.yyzz != null && user.yyzz != ''){
+                this.imgList.push({"imgUrl":user.yyzz,"imgRemark":"营业执照"})
+            }
+            if(user.gsp != null && user.gsp != ''){
+                this.imgList.push({"imgUrl":user.gsp,"imgRemark":"GSP"})
+            }
+            if(user.ypjyxkz != null && user.ypjyxkz != ''){
+                this.imgList.push({"imgUrl":user.ypjyxkz,"imgRemark":"药品经营许可证"})
+            }
         },
         getCardList(userId) {
             api.get("/cms/user/bankCard/list",

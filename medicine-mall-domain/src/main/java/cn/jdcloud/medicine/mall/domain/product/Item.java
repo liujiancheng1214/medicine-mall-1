@@ -106,8 +106,6 @@ public class Item extends BaseDomain {
     private BigDecimal retailPrice;
     /**平台价格*/
     private BigDecimal platformPrice;
-//    /**平台团购价格*/
-//    private BigDecimal promotionPrice;
     /**生产日期 */
     private Date productionDate;
     // 有效日期  生产日期+有效月
@@ -185,9 +183,7 @@ public class Item extends BaseDomain {
     private String attention;
     // 禁忌
     private  String taboo;
-    /**
-     * promotion_price
-     */
-    private BigDecimal promotionPrice;
+
+    private  String erpId;
 
 }

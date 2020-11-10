@@ -1,17 +1,13 @@
 package cn.jdcloud.medicine.mall.api.biz.user.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.jdcloud.medicine.mall.domain.user.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -34,11 +30,6 @@ import cn.jdcloud.medicine.mall.dao.sys.RegionMapper;
 import cn.jdcloud.medicine.mall.dao.user.UserAddressMapper;
 import cn.jdcloud.medicine.mall.dao.user.UserMapper;
 import cn.jdcloud.medicine.mall.domain.sys.Region;
-import cn.jdcloud.medicine.mall.domain.user.User;
-import cn.jdcloud.medicine.mall.domain.user.UserAddress;
-import cn.jdcloud.medicine.mall.domain.user.UserDto;
-import cn.jdcloud.medicine.mall.domain.user.UserExcel;
-import cn.jdcloud.medicine.mall.domain.user.UserResult;
 
 /**
  * @author chenQF
@@ -275,7 +266,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return result;
     }
 
-	@Override
+    @Override
+    public Set<UserImgVO> getUserImg(Integer userId) {
+        User user = userMapper.selectById(userId);
+        Set<UserImgVO> set = new HashSet<>();
+        if (!StringUtils.isBlank(user.getCgwtssmj())) {
+            set.add(new UserImgVO(user.getCgwtssmj(),"采购委托书扫描件.jpg"));
+        }
+        if (!StringUtils.isBlank(user.getCgysfsmj())) {
+            set.add(new UserImgVO(user.getCgysfsmj(),"身份证扫描件.jpg"));
+        }
+        if (!StringUtils.isBlank(user.getGsp())) {
+            set.add(new UserImgVO(user.getGsp(),"GSP.jpg"));
+        }
+        if (!StringUtils.isBlank(user.getYljgzyxkz())) {
+            set.add(new UserImgVO(user.getYljgzyxkz(),"医疗机构执业许可证.jpg"));
+        }
+        if (!StringUtils.isBlank(user.getYyzz())) {
+            set.add(new UserImgVO(user.getYyzz(),"营业执照.jpg"));
+        }
+        if (!StringUtils.isBlank(user.getYpjyxkz())) {
+            set.add(new UserImgVO(user.getYpjyxkz(),"药品经营许可证.jpg"));
+        }
+        return set;
+    }
+
+    @Override
 	public User login(String username, String password) {
 		User user=queryUserByMobile(username);
 		if(user==null) {
@@ -335,7 +351,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 		}
 		return null;
 	}
-	
+
 	@Override
 	public User queryUserByMobile(String mobile) {
 		QueryWrapper<User> queryWrapper=new QueryWrapper<User>();

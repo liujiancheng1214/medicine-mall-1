@@ -4,9 +4,11 @@ package cn.jdcloud.medicine.mall.api.biz.user.service;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
+import cn.jdcloud.medicine.mall.domain.user.UserImgVO;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -21,8 +23,8 @@ import cn.jdcloud.medicine.mall.domain.user.UserResult;
  * @desc 用户业务接口
  */
 public interface UserService extends IService<User>{
-	
-	
+
+
 	User  queryUserByMobile(String mobil);
 	/**
 	 * 用户登录
@@ -31,15 +33,15 @@ public interface UserService extends IService<User>{
 	 * @return
 	 */
 	User login(String username,String password);
-	
-	
+
+
 	/**
 	 * 用户注册
 	 * @param userAddVo
 	 * @return
 	 */
 	User regist(UserAddVo userAddVo);
-	
+
     /**
      * 查询客户列表
      * @param page
@@ -87,4 +89,13 @@ public interface UserService extends IService<User>{
      * @throws IOException
      */
     Map readExcel(MultipartFile file) throws IOException;
+
+    /**
+     * 获取用户图片
+     * @param userId
+     * @return: java.util.List<cn.jdcloud.medicine.mall.domain.user.UserImgVO>
+     * @author: HuXuNing
+     * @date: 2020/11/10 22:12
+     */
+    Set<UserImgVO> getUserImg(Integer userId);
 }
