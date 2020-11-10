@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jdcloud.medicine.mall.dao.order.OrderInfoMapper" >
+
+    <resultMap id="infoList" type="cn.jdcloud.medicine.mall.domain.order.vo.OrderInfoVO">
+        <id property="id" column="id"></id>
+        <result property="orderId" column="order_type"></result>
+        <result property="itemId" column="order_status"></result>
+        <result property="itemName" column="user_id"></result>
+        <result property="itemNum" column="user_name"></result>
+        <result property="itemIcon" column="total_num"></result>
+        <result property="itemPrice" column="total_amount"></result>
+        <result property="totalPrice" column="discount_amount"></result>
+        <result property="itemNo" column="payment_amount"></result>
+        <result property="spec" column="express_company_id"></result>
+        <result property="factory" column="express_company"></result>
+    </resultMap>
+
+
+
+    <select  id="orderItemList" resultType="cn.jdcloud.medicine.mall.domain.order.dto.OrderItemListDto">
+
+       select
+         a.user_id userId,
+         b.item_no itemNo,
+         b.id itemId,
+         b.item_name,
+         b.approval_no_end_at effectiveDate ,
+         b.item_brand_id brandId,
+         (select ibrand_name from t_item_brand where id=b.item_brand_id) brandName  ,
+         a.item_price itemPrice,
+         a.item_num itemNum ,
+         b.img_cover imgCover,
+         c.order_status orderStatus,
+         c.order_id orderId
+      from t_order_info a ,t_item  b  ,t_order c
+      where a.item_id =b.id
+          and a.order_id=c.order_id
+          and a.user_id=#{userId}
+          and c.order_id=#{orderId}
+
+    </select>
+
+
+
+
+    <select id="getInfoByOrderId" resultType="cn.jdcloud.medicine.mall.domain.order.vo.OrderInfoVO">
+        SELECT
+        t1.id,
+        t1.order_id,
+        t1.item_id,
+        t1.item_name,
+        t1.item_num,
+        t1.item_icon,
+        t1.item_price,
+        t1.total_price,
+        t2.item_no,
+        t2.spec,
+        t2.factory,
+        t2.qty,
+        DATE_ADD(t3.produced_time, INTERVAL t2.expiry_date MONTH) AS validDay,
+        IFNULL(t5.item_num, 0) AS refund_num,
+        IFNULL(t5.total_price, 0) AS refund_price
+        FROM
+        t_order_info AS t1
+        JOIN t_item AS t2 ON t2.id = t1.item_id
+        JOIN t_item_batch AS t3 ON t3.item_no = t2.item_no AND t3.batch_no = t1.item_batch_no
+        LEFT JOIN t_refund_order AS t4 ON t4.order_id = t1.order_id AND t4.status = 6
+        LEFT JOIN t_refund_order_info AS t5 ON t5.refund_order_id = t4.id AND t5.item_id = t1.item_id
+        <where>
+            1 = 1
+            <if test="orderId != null">
+                AND t1.order_id = #{orderId}
+            </if>
+        </where>
+    </select>
+
+    <select id="orderDetail" resultType="cn.jdcloud.medicine.mall.domain.order.vo.OrderInfoVO">
+        SELECT
+        t1.item_id,
+        t1.item_name,
+        t1.item_num,
+        t1.item_icon,
+        t1.item_price,
+        t2.item_no,
+        t2.spec,
+        t2.factory,
+        t2.qty,
+        DATE_ADD(t3.produced_time, INTERVAL t2.expiry_date MONTH) AS validDay
+        FROM
+        t_order_info AS t1
+        JOIN t_item AS t2 ON t2.id = t1.item_id
+        JOIN t_item_batch AS t3 ON t3.item_no = t2.item_no AND t3.batch_no = t1.item_batch_no
+        <where>
+            1 = 1
+            <if test="orderId != null">
+                AND t1.order_id = #{orderId}
+            </if>
+        </where>
+    </select>
+</mapper>

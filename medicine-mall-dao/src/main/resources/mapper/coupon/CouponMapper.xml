@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jdcloud.medicine.mall.dao.coupon.CouponMapper">
+
+    <sql id="Example_Where_Clause">
+        <where>
+            1=1
+            /* 优惠券类型 */
+            <if test="type != null and type != ''">
+                and tc.type = #{type}
+            </if>
+        </where>
+    </sql>
+
+    <select id="listCoupon" resultType="cn.jdcloud.medicine.mall.domain.coupon.CouponResult">
+        select tc.*,sa.name
+        as creatorName,sa1.name as updatorName
+        from t_coupon tc
+        left join s_admin sa on tc.creator = sa.id
+        left join s_admin sa1 on tc.updator = sa1.id
+        <include refid="Example_Where_Clause"/>
+        order by tc.create_time desc
+    </select>
+
+    <select id="listCount" resultType="java.lang.Integer">
+        select count(*)
+        from t_coupon tc
+        <include refid="Example_Where_Clause"/>
+    </select>
+
+</mapper>

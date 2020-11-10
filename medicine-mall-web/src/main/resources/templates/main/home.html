@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="common/header::common_head"/>
+    <style>
+        [v-cloak]{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <h1 style="text-align: center;padding-top: 30px">欢迎使用医药商城后台管理！</h1>
+    <div>
+
+
+    </div>
+</div>
+<div th:replace="common/script::footer_script"></div>
+<script type="text/babel" th:src="${staticUrl} + '/common/axios/upload.js?version=' + ${version}"></script>
+<script type="text/babel" th:src="${staticUrl}+'/main/js/home.js'"></script>
+</body>
+</html>

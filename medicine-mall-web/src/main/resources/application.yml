@@ -1,0 +1,87 @@
+
+spring.profiles.include: mysql,redis
+# swagger2
+swagger2:
+  package: cn.jdcloud.medicine.mall.web
+server:
+  port: 7070
+  session-timeout: 180
+  tomcat.max-threads: 0
+  tomcat.uri-encoding: UTF-8
+  servlet:
+    context-path: /
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password:
+    database: 0
+    timeout: 3000ms
+    # 连接池配置，2.0中直接使用jedis或者lettuce配置连接池
+    jedis:
+      pool:
+        # 最大空闲连接数
+        max-idle: 1024
+        # 最小空闲连接数
+        min-idle: 300
+        # 等待可用连接的最大时间，负数为不限制
+        max-wait:  -1ms
+        # 最大活跃连接数，负数为不限制
+        max-active: -1
+  #配置http编码（非常重要，否则中文乱码）
+  http:
+    encoding:
+      force: true
+      charset: UTF-8
+      enabled: true
+  #模板语言配置
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+    check-template-location: true
+    mode: LEGACYHTML5
+  messages:
+    basename: i18n/messages
+    baseFolder: i18n
+  # 热部署
+  devtools:
+    restart:
+      enabled: false
+
+web:
+  api:
+    url: http://localhost:8089
+  upload:
+    url: http://192.168.3.169:8099/file
+  base:
+    url: http://localhost:8088
+  static:
+    url: http://localhost:8088/static
+  version: 1.0.0
+  platform:
+    name: 医药商城管理后台
+    logo: logo
+
+
+mybatis:
+  # spring boot集成mybatis的方式打印sql
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  level:
+    com:
+      looedu:
+        mapper: INFO
+
+#============阿里云OSS配置=================
+oss:
+  aliyun:
+    endpoint: https://oss-cn-qingdao.aliyuncs.com
+    accessKeyId: LTAI4FnHixH9ffmT2i3D9CtL
+    ccessKeySecret: g3JfvahPWon5iWw8LxercdX5A8L4ZJ
+    bucketName: taochonghui
+    picLocation: yw/image
+
+

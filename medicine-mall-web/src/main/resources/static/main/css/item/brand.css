@@ -1,0 +1,23 @@
+[v-cloak]{
+    display: none;
+}
+.ivu-table-cell {
+    padding: 0 !important;
+}
+#brand{
+    padding-top: 10px;
+}
+.btn-action-group{
+    margin-left: 10px;
+    margin-top: 10px;
+}
+.brandList{
+    margin-top: 10px;
+}
+.brandPage{
+    float: right;
+    padding: 5px 10px;
+}
+.brandTree{
+    padding: 10px 30px;
+}

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jdcloud.medicine.mall.dao.admin.RoleMapper" >
+  <resultMap id="BaseResultMap" type="cn.jdcloud.medicine.mall.domain.admin.Role" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="role_name" property="roleName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, role_name, create_time, update_time
+  </sql>
+ 
+  <insert id="insert" parameterType="cn.jdcloud.medicine.mall.domain.admin.Role" >
+    insert into s_role (id, role_code, role_name,
+      create_time, update_time)
+    values (#{id}, #{roleCode}, #{roleName},
+      #{createTime}, #{updateTime})
+  </insert>
+
+  <select id="listRolesByAdminId" resultMap="BaseResultMap">
+        select
+        t2.role_name,
+        t2.id
+    from s_admin_role t1
+        inner join s_role t2
+        on t1.role_id = t2.id
+        where t1.admin_id = ${adminId}
+  </select>
+
+  <select id="listAll" resultMap="BaseResultMap">
+ select
+        t2.role_name,
+        t2.id
+    from s_role t2
+  </select>
+
+
+  <select id="getPermValuesById" resultType="java.lang.String" parameterType="int">
+    SELECT
+      t1.value
+    FROM
+      s_permission t1 inner join
+      s_role_permission t2
+      on t1.id = t2.permission_id
+    where t2.role_id=#{roleId}
+  </select>
+
+
+
+
+
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.jdcloud.medicine.mall.dao.promotion.GroupUserMapper">
+
+    <select id="listGroupUser" resultType="cn.jdcloud.medicine.mall.domain.promotion.GroupUserResult">
+        select tgu.*, tu.company_name
+        as userName,tu.mobile
+        as userPhone
+        from t_group_user tgu
+        left join t_user tu on tgu.user_id = tu.id
+        where tgu.group_id = #{groupId}
+        order by tgu.create_time desc
+    </select>
+
+    <select id="listCount" resultType="java.lang.Integer">
+        select count(*)
+        from t_group_user tgu
+        left join t_user tu on tgu.user_id = tu.id
+        where tgu.group_id = #{groupId}
+    </select>
+
+</mapper>

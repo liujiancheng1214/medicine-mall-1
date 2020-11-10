@@ -1,0 +1,9 @@
+configurations {
+	provided
+}
+
+dependencies {
+	compile project(':medicine-mall-domain')
+    compile ("log4j:log4j:${log4jVersion}")
+}
+

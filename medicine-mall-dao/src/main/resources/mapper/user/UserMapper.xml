@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jdcloud.medicine.mall.dao.user.UserMapper">
+    <sql id="Base_Column_List">
+    id, help_Code, openid, mobile, password, type, company_name, contact_name, contact_phone,
+    contact_address, province_id, city_id, district_id, tax_no, invoice_type, user_level_id,
+    status, salt, create_time, update_time
+  </sql>
+    <sql id="Example_Where_Clause">
+        <where>
+            1=1
+            /* 用户等级 */
+            <if test="userDto.userLevelId != null and userDto.userLevelId != ''">
+                and tu.user_level_id = #{userDto.userLevelId}
+            </if>
+            /* 注册时间区间 */
+            <if test="userDto.startRegisterTime != null  and userDto.startRegisterTime != ''
+            and userDto.endRegisterTime != null and userDto.endRegisterTime != ''">
+                and tu.create_time between #{userDto.startRegisterTime} and #{userDto.endRegisterTime}
+            </if>
+            /* 省 */
+            <if test="userDto.provinceId != null and userDto.provinceId != ''">
+                and tu.province_id = #{userDto.provinceId}
+            </if>
+            /* 市 */
+            <if test="userDto.cityId != null and userDto.cityId != ''">
+                and tu.city_id = #{userDto.cityId}
+            </if>
+            /* 区 */
+            <if test="userDto.districtId != null and userDto.districtId != ''">
+                and tu.district_id = #{userDto.districtId}
+            </if>
+            /* 手机号 */
+            <if test="userDto.mobile != null and userDto.mobile != ''">
+                and tu.mobile = #{userDto.mobile}
+            </if>
+            /* 开户状态 */
+            <if test="userDto.accountStatus != null and userDto.accountStatus != ''">
+                and tu.account_status = #{userDto.accountStatus}
+            </if>
+            /* 输入客户名称 */
+            <if test="userDto.keyWord != null and userDto.keyWord != ''">
+                and tu.company_name like concat('%',#{userDto.keyWord},'%')
+            </if>
+        </where>
+    </sql>
+    <!--连表查询处理外键字段id-->
+    <select id="listUser" resultType="cn.jdcloud.medicine.mall.domain.user.UserResult">
+        select tu.*, tr.name
+        as provinceName, tr1.name
+        as cityName, tr2.name
+        as districtName, tul.level_name
+        as userLevelName
+        from t_user tu
+        left join t_region tr on tu.province_id = tr.id
+        left join t_region tr1 on tu.city_id = tr1.id
+        left join t_region tr2 on tu.district_id = tr2.id
+        left join t_user_level tul on tu.user_level_id = tul.id
+        <include refid="Example_Where_Clause"/>
+        order by tu.create_time desc
+    </select>
+    <!--查询所有数据总数-->
+    <select id="listCount" resultType="java.lang.Integer">
+        select count(*)
+        from t_user tu
+        left join t_region tr on tu.province_id = tr.id
+        left join t_region tr1 on tu.city_id = tr1.id
+        left join t_region tr2 on tu.district_id = tr2.id
+        left join t_user_level tul on tu.user_level_id = tul.id
+        <include refid="Example_Where_Clause"/>
+    </select>
+    <!--查询所有数据-->
+    <select id="listAll" parameterType="String" resultType="cn.jdcloud.medicine.mall.domain.user.UserExcel">
+        select tu.*, tr.name
+        as provinceId, tr1.name
+        as cityId, tr2.name
+        as districtId, tul.level_name
+        as userLevelId
+        from t_user tu
+        left join t_region tr on tu.province_id = tr.id
+        left join t_region tr1 on tu.city_id = tr1.id
+        left join t_region tr2 on tu.district_id = tr2.id
+        left join t_user_level tul on tu.user_level_id = tul.id
+        order by tu.create_time desc
+    </select>
+    <!--批量增加测试-->
+    <insert id="insertList" parameterType="java.util.List" keyColumn="id" useGeneratedKeys="true">
+        insert into t_user
+        (help_Code, openid, mobile, password, type, company_name, contact_name, contact_phone,
+        contact_address, province_id, city_id, district_id, tax_no, invoice_type, user_level_id,
+        status, salt, create_time, update_time)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.helpCode,jdbcType=VARCHAR}, #{item.openid,jdbcType=VARCHAR},
+            #{item.mobile,jdbcType=VARCHAR}, #{item.password,jdbcType=VARCHAR}, #{item.type,jdbcType=TINYINT},
+            #{item.companyName,jdbcType=VARCHAR}, #{item.contactName,jdbcType=VARCHAR},
+            #{item.contactPhone,jdbcType=VARCHAR},
+            #{item.contactAddress,jdbcType=VARCHAR}, #{item.provinceId,jdbcType=INTEGER},
+            #{item.cityId,jdbcType=INTEGER},
+            #{item.districtId,jdbcType=INTEGER}, #{item.taxNo,jdbcType=VARCHAR}, #{item.invoiceType,jdbcType=VARCHAR},
+            #{item.userLevelId,jdbcType=INTEGER}, #{item.status,jdbcType=TINYINT}, #{item.salt,jdbcType=VARCHAR},
+            #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+</mapper>

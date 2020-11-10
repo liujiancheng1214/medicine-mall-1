@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jdcloud.medicine.mall.dao.order.OrderMapper" >
+
+    <resultMap id="orderList" type="cn.jdcloud.medicine.mall.domain.order.vo.OrderVo">
+        <id property="orderId" column="order_id"></id>
+        <result property="orderType" column="order_type"></result>
+        <result property="orderStatus" column="order_status"></result>
+        <result property="userId" column="user_id"></result>
+        <result property="userName" column="user_name"></result>
+        <result property="totalNum" column="total_num"></result>
+        <result property="totalAmount" column="total_amount"></result>
+        <result property="discountAmount" column="discount_amount"></result>
+        <result property="paymentAmount" column="payment_amount"></result>
+        <result property="expressCompanyId" column="express_company_id"></result>
+        <result property="expressCompany" column="express_company"></result>
+        <result property="expressNo" column="express_no"></result>
+        <result property="userRemark" column="user_remark"></result>
+        <result property="adminRemark" column="admin_remark"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="updateTime" column="update_time"></result>
+        <association property="user" javaType="cn.jdcloud.medicine.mall.domain.user.UserResult">
+            <id property="id" column="id"></id>
+            <result property="helpCode" column="help_code"></result>
+            <result property="mobile" column="mobile"></result>
+            <result property="companyName" column="company_name"></result>
+            <result property="contactName" column="contact_name"></result>
+            <result property="contactPhone" column="contact_phone"></result>
+            <result property="contactAddress" column="contact_address"></result>
+            <result property="invoiceType" column="invoice_type"></result>
+            <result property="provinceName" column="province_name"></result>
+            <result property="cityName" column="city_name"></result>
+        </association>
+    </resultMap>
+
+    <sql id="orderList" >
+       t1.order_id,
+       t1.order_type,
+       t1.order_status,
+       t1.user_id,
+       t1.user_name,
+       t1.total_num,
+       t1.total_amount,
+       t1.discount_amount,
+       t1.payment_amount,
+       t1.receive_address_id,
+       t1.delivery_method,
+       t1.express_company_id,
+       t1.express_no,
+       t1.order_status,
+       t1.user_remark,
+       t1.admin_remark,
+       t1.create_time,
+       t1.update_time,
+       t2.id,
+       t2.help_code,
+       t2.mobile,
+       t2.company_name,
+       t2.contact_name,
+       t2.contact_phone,
+       t2.contact_address,
+       t2.status,
+       t3.name AS province_name,
+       t4.name AS city_name,
+       t5.name AS express_company
+    </sql>
+
+    <select id="selectOrderPage" resultMap="orderList">
+        SELECT
+        <include refid="orderList"></include>
+        FROM
+        t_order t1
+        LEFT JOIN t_user t2 ON t2.id = t1.user_id
+        LEFT JOIN t_region t3 ON t3.id = t2.province_id
+        LEFT JOIN t_region t4 ON t4.id = t2.city_id
+        LEFT JOIN t_express_company t5 ON t5.id = t1.express_company_id
+        <where>
+            1 = 1
+            <if test="map.orderStatus != null">
+                AND
+                <if test="map.orderStatus != 8">
+                    t1.order_status = #{map.orderStatus}
+                </if>
+                <if test="map.orderStatus == 8">
+                    (t1.order_status in (8,9,10))
+                </if>
+            </if>
+            <if test="map.startDate != null and map.startDate != ''">
+                AND t1.create_time &gt;= #{map.startDate}
+            </if>
+            <if test="map.endDate != null and map.endDate != ''">
+                AND t1.create_time &lt;= #{map.endDate}
+            </if>
+            <if test="map.searchValue != null and map.searchValue != ''">
+                AND (t1.order_id LIKE CONCAT('%',#{map.searchValue},'%')
+                OR t2.company_name LIKE CONCAT('%',#{map.searchValue},'%')
+                OR t2.help_code LIKE CONCAT('%',#{map.searchValue},'%')
+                OR t2.contact_phone LIKE CONCAT('%',#{map.searchValue},'%'))
+            </if>
+        </where>
+        ORDER BY t1.update_time DESC
+    </select>
+
+    <select id="selectTabCount" resultType="cn.jdcloud.medicine.mall.domain.order.vo.OrderTabCountVo" parameterType="java.util.Map">
+        SELECT
+        IFNULL(SUM(CASE WHEN order_status = 0 THEN 1 ELSE 0 END), 0) AS tab1,
+        IFNULL(SUM(CASE WHEN order_status = 2 THEN 1 ELSE 0 END), 0) AS tab2,
+        IFNULL(SUM(CASE WHEN order_status = 3 THEN 1 ELSE 0 END), 0) AS tab3,
+        IFNULL(SUM(CASE WHEN order_status = 4 THEN 1 ELSE 0 END), 0) AS tab4,
+        IFNULL(SUM(CASE WHEN order_status = 5 THEN 1 ELSE 0 END), 0) AS tab5,
+        IFNULL(SUM(CASE WHEN order_status = 6 THEN 1 ELSE 0 END), 0) AS tab6,
+        IFNULL(SUM(CASE WHEN order_status = 7 THEN 1 ELSE 0 END), 0) AS tab7,
+        IFNULL(SUM(CASE WHEN order_status = 11 THEN 1 ELSE 0 END), 0) AS tab8,
+        IFNULL(SUM(CASE WHEN order_status = 8 OR order_status = 9 OR order_status = 10 THEN 1 ELSE 0 END), 0) AS tab9
+        FROM
+        t_order AS t1
+        LEFT JOIN t_user AS t2 ON t2.id = t1.user_id
+        <where>
+            1 = 1
+            <if test="startDate != null and startDate != ''">
+                AND t1.create_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND t1.create_time &lt;= #{endDate}
+            </if>
+            <if test="searchValue != null and searchValue != ''">
+                AND (t1.order_id LIKE CONCAT('%',#{searchValue},'%')
+                OR t2.company_name LIKE CONCAT('%',#{searchValue},'%')
+                OR t2.help_code LIKE CONCAT('%',#{searchValue},'%')
+                OR t2.contact_phone LIKE CONCAT('%',#{searchValue},'%'))
+            </if>
+        </where>
+    </select>
+
+</mapper>

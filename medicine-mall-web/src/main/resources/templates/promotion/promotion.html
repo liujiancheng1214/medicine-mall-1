@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="common/header::common_head"/>
+    <link th:href="${staticUrl} + '/common/element-ui/theme-chalk/index.css?version=' + ${version}" rel="stylesheet"
+          type="text/css">
+    <script th:src="${staticUrl} + '/common/element-ui/index.js?version=' + ${version}"></script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .ivu-table-cell {
+            padding-bottom: 10px;
+        }
+
+        .ivu-table-cell p {
+            margin-top: 10px;
+        }
+
+        textarea:disabled {
+            -webkit-text-fill-color: #333;
+            -webkit-opacity: 1;
+            color: #333;
+        }
+
+        .col_title {
+            background: #f0f0f0;
+            text-align: right;
+        }
+
+        .info_div th {
+            border: 0px;
+            width: 60px;
+        }
+
+        .info_div td {
+            padding: 10px 10px;
+            border: 1px solid #888;
+        }
+
+        .info_div .ivu-row {
+            border: 1px solid #888;
+            border-right: 0px;
+        }
+        .info_div .ivu-col {
+            padding: 10px 10px;
+            border-right: 1px solid #888;
+        }
+        .ivu-table .ivu-table-header th {
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .ivu-table .ivu-table-header .ivu-table-cell {
+            font-size: 13px;
+            padding-bottom: 0px
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <Tabs type="card" v-model="conditions.tab" style="padding: 20px 10px" @on-click="loadData">
+        <Tab-pane label="待审批" name="0"></Tab-pane>
+        <Tab-pane label="未开始" name="1"></Tab-pane>
+        <Tab-pane label="进行中" name="2"></Tab-pane>
+        <Tab-pane label="已结束" name="3"></Tab-pane>
+    </Tabs>
+    <div style="margin:0 20px">
+        <Row type="flex" align="middle" style="margin-bottom: 20px">
+            <i-col span="6">
+                <i-input search placeholder="活动ID/活动名称" v-model="conditions.searchValue" @on-search="loadData"/>
+            </i-col>
+            <i-col span="2" offset="14" v-if="conditions.tab==0">
+                <i-button type="primary" @click="batchDelete" shape="circle"
+                          size="large">批量作废
+                </i-button>
+            </i-col>
+            <i-col span="1" offset="15" v-if="conditions.tab!=0">
+            </i-col>
+            <i-col span="2" v-if="conditions.tab==0">
+                <i-button type="primary" @click="addPromotion" shape="circle"
+                          size="large">新增活动
+                </i-button>
+            </i-col>
+        </Row>
+        <i-table :height="tableHeight" ref="table" stripe border :loading="loading" @on-selection-change="getSelection"
+                 :columns="tableHead"
+                 :data="tableData"></i-table>
+        <div style="margin: 10px;">
+            <div style="float: right;">
+                <Page :total="page.total" :current="page.current" :page-size="page.size" show-total
+                      @on-change="changePage" show-sizer show-elevator></Page>
+            </div>
+        </div>
+    </div>
+    <Drawer
+            title="编辑活动"
+            v-model="showEdit"
+            width="100"
+            :mask-closable="false"
+            @on-close="emptyForm"
+    >
+        <i-form ref="editForm" :model="newPromotion" :label-width="120" :rules="ruleValidate">
+            <Divider orientation="left" style="font-size: 20px">活动规则设置</Divider>
+            <div style="padding-left: 50px">
+                <Form-item label="促销活动名称" prop="promotionName"
+                           :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                    <i-input style="width: 500px" req v-model="newPromotion.promotionName"></i-input>
+                </Form-item>
+
+                <Form-item label="分享显示标题" prop="shareTitle"
+                           :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                    <i-input type="textarea" :rows="3" style="width: 500px"
+                             v-model="newPromotion.shareTitle"></i-input>
+                </Form-item>
+                <Form-item label="活动期限" prop="beginTime"
+                           :rules="{required: true, message: '请选择活动时间范围', trigger: 'change',pattern: /.+/}">
+                    <Date-picker type="datetimerange" :options="dateOptions" @on-change="changeTimerange"
+                                 v-model="timerange" format="yyyy-MM-dd HH:mm" style="width: 500px"></Date-picker>
+                </Form-item>
+                <Row>
+                    <i-col span="4">
+                        <Form-item label="限购" prop="quotaBuyState"
+                                   :rules="{required: true, message: '请选择选项', trigger: 'change'}">
+                            <i-select v-model="newPromotion.quotaBuyState" style="width:160px">
+                                <i-option value="1" :key="1">限购</i-option>
+                                <i-option value="2" :key="2">不限购</i-option>
+                            </i-select>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="5">
+                        <Form-item label="配额(份/人)" v-if="newPromotion.quotaBuyState==1" prop="quotaUserNum">
+                            <i-input style="width: 320px" number v-model="newPromotion.quotaUserNum"></i-input>
+                        </Form-item>
+                    </i-col>
+                </Row>
+                <Row>
+                    <i-col span="4">
+                        <Form-item label="PLUS独享" prop="specialBusinessPlus"
+                                   :rules="{required: true, message: '请选择选项', trigger: 'change'}">
+                            <i-select v-model="newPromotion.specialBusinessPlus" style="width:160px">
+                                <i-option value="1" :key="1">独享</i-option>
+                                <i-option value="2" :key="2">非独享</i-option>
+                            </i-select>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="4">
+                        <Form-item label="优惠券" prop="useCouponState"
+                                   :rules="{required: true, message: '请选择选项', trigger: 'change'}">
+                            <i-select v-model="newPromotion.useCouponState" style="width:160px">
+                                <i-option value="1" :key="1">可以使用</i-option>
+                                <i-option value="2" :key="2">不能使用</i-option>
+                            </i-select>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="4">
+                        <Form-item label="返佣金" prop="brokerGetState"
+                                   :rules="{required: true, message: '请选择选项', trigger: 'change'}">
+                            <i-select v-model="newPromotion.brokerGetState" style="width:160px">
+                                <i-option value="1" :key="1">返佣金</i-option>
+                                <i-option value="2" :key="2">不返佣金</i-option>
+                            </i-select>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="4">
+                        <Form-item label="获取积分" prop="givePointState"
+                                   :rules="{required: true, message: '请选择选项', trigger: 'change'}">
+                            <i-select v-model="newPromotion.givePointState" style="width:160px">
+                                <i-option value="1" :key="1">可获取</i-option>
+                                <i-option value="2" :key="2">不可获取</i-option>
+                            </i-select>
+                        </Form-item>
+                    </i-col>
+                </Row>
+                <Row>
+                    <i-col span="4">
+                        <Form-item label="活动类型" prop="promotionType"
+                                   :rules="{required: true, message: '请选择选项', trigger: 'change'}">
+                            <i-select v-model="newPromotion.promotionType" style="width:160px">
+                                <i-option value="1" :key="1">拼团</i-option>
+                            </i-select>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="6">
+                        <Form-item label="规则模板" prop="ruleId"
+                                   v-if="newPromotion.promotionType!=null&&newPromotion.promotionType!=''">
+                            <i-select
+                                    v-model="newPromotion.ruleId" filterable remote :remote-method="remotePromotion"
+                                    :loading="selectLoading" @on-change="changeRule">
+                                <i-option v-for="(option, index) in ruleOptions" :value="option.id" :key="index">
+                                    {{option.groupName}}
+                                </i-option>
+                            </i-select>
+                        </Form-item>
+                    </i-col>
+                </Row>
+                <Form-item label="规则描述" v-if="newPromotion.promotionType!=null&&newPromotion.promotionType!=''">
+                    <i-input v-model="selectedRule.rule" disabled type="textarea" :rows="4" style="width: 500px"/>
+                </Form-item>
+            </div>
+        </i-form>
+
+        <i-form ref="itemsForm" :model="newPromotion.items" :label-width="120">
+            <Divider orientation="left" style="font-size: 20px">活动商品设置</Divider>
+            <div style="padding-left: 50px">
+                <i-button type="primary" style="width: 120px;margin: 10px 120px" @click="addItemRow">增加</i-button>
+                <div v-for="(item, index) in newPromotion.items" :key="temp">
+                    <Row>
+                        <i-col span="6">
+                            <Form-item label="活动商品" :prop="index+'.itemNo'"
+                                       :rules="[{required: true, message: '请选择商品', trigger: 'change'}]">
+                                <i-select
+                                        v-model="item.itemNo" filterable remote :remote-method="remoteItem"
+                                        :loading="selectLoading">
+                                    <i-option v-for="(option, key) in itemList" :value="option.itemNo"
+                                              :label="option.itemName" :key="option.itemNo">
+                                        <span>{{option.itemName}}</span>
+                                        <span style="float:right;color:#ccc">{{option.itemNo}}</span>
+                                    </i-option>
+                                </i-select>
+                            </Form-item>
+                        </i-col>
+                        <!--                        <i-col span="6">-->
+                        <!--                            <Form-item label="商品批次" :prop="index+'.batchNos'" :rules="{type:'array', required: true, message: '请选择批次'}" >-->
+                        <!--                                <i-select v-model="item.batchNos" multiple @on-open-change="flag => selectBatch(flag,index)">-->
+                        <!--                                    <i-option v-for="(option, key) in selectBatchList" :value="option.batchNo"-->
+                        <!--                                              :key="option.batchNo">-->
+                        <!--                                        {{option.batchNo}}-->
+                        <!--                                    </i-option>-->
+                        <!--                                </i-select>-->
+                        <!--                            </Form-item>-->
+                        <!--                        </i-col>-->
+                        <i-col span="4">
+                            <Form-item label="促销单价" :prop="index+'.promotionPrice'" :rules="[{required: true, message: '不能为空', trigger: 'blur'},
+                        { type: 'number', message: '请输入正确价格', trigger: 'blur',transform(value) { return Number(value);}}]">
+                                <i-input style="width: 100px" v-model="item.promotionPrice"></i-input>
+                            </Form-item>
+                        </i-col>
+                        <i-col span="3">
+                            <i-button type="error" style="width: 120px" v-if="index!=0" @click="deleteRow(index)">删除
+                            </i-button>
+                        </i-col>
+                    </Row>
+                    <Row>
+                        <i-col span="4">
+                            <Form-item label="单份数量" :prop="index+'.itemNum'" :rules="[{required: true, message: '不能为空', trigger: 'blur'},
+                        { type: 'number', message: '请输入数字', trigger: 'blur',transform(value) { return Number(value);}}]">
+                                <i-input style="width: 150px" v-model="item.itemNum"></i-input>
+                            </Form-item>
+                        </i-col>
+                        <i-col span="4">
+                            <Form-item label="参与类型" :prop="index+'.totalItemType'"
+                                       :rules="{required: true, message: '请选择选项', trigger: 'change'}">
+                                <i-select v-model="item.totalItemType" @on-change="changeTemp()">
+                                    <i-option value="1" :key="1">实际库存</i-option>
+                                    <i-option value="2" :key="2">固定数量</i-option>
+                                </i-select>
+                            </Form-item>
+                        </i-col>
+                        <i-col span="4" v-if="item.totalItemType==2">
+                            <Form-item label="参与总数量" :prop="index+'.totalItemNum'"
+                                       :rules="[{required: true, message: '不能为空', trigger: 'blur'},{type: 'number', message: '请输入数字', trigger: 'blur',transform(value) { return Number(value);}}]">
+                                <i-input style="width: 150px" v-model="item.totalItemNum"></i-input>
+                            </Form-item>
+                        </i-col>
+                    </Row>
+                </div>
+            </div>
+        </i-form>
+        <Divider orientation="left" style="font-size: 20px"></Divider>
+        <Row>
+            <i-col span="3" offset="3">
+                <i-button type="primary" style="width: 150px" @click="savePromotion">提交</i-button>
+            </i-col>
+            <i-col span="3" offset="2">
+                <i-button style="width: 150px" @click="reset">重置</i-button>
+            </i-col>
+        </Row>
+    </Drawer>
+    <Drawer
+            title="活动详情"
+            v-model="showInfo"
+            width="100"
+            :mask-closable="false"
+    >
+        <div style="width:1400px;padding: 20px 50px" class="info_div">
+            <table cellspacing="0" cellpadding="0">
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tbody>
+                <tr>
+                    <td colspan="3" class="col_title">促销方案名称：</td>
+                    <td colspan="9">{{promotionInfo.promotionName}}</td>
+                    <td colspan="3" class="col_title">活动时间：</td>
+                    <td colspan="9">{{promotionInfo.beginTime}} ~ {{promotionInfo.endTime}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="col_title">分享显示标题：</td>
+                    <td colspan="21">{{promotionInfo.shareTitle}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="col_title">活动类型：</td>
+                    <td colspan="5">{{dict.promotionType[promotionInfo.promotionType]}}</td>
+                    <td colspan="3" class="col_title">PLUS独享：</td>
+                    <td colspan="5">{{dict.specialBusinessPlus[promotionInfo.specialBusinessPlus]}}</td>
+                    <td colspan="3" class="col_title">获取积分：</td>
+                    <td colspan="5">{{dict.givePointState[promotionInfo.givePointState]}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="col_title">限购：</td>
+                    <td colspan="5">{{promotionInfo.quotaBuyState==1?(promotionInfo.quotaUserNum+"份"):"不限购"}}</td>
+                    <td colspan="3" class="col_title">反佣金：</td>
+                    <td colspan="5">{{dict.brokerGetState[promotionInfo.brokerGetState]}}</td>
+                    <td colspan="3" class="col_title">优惠券：</td>
+                    <td colspan="5">{{dict.useCouponState[promotionInfo.useCouponState]}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="col_title">创建用户：</td>
+                    <td colspan="5">{{promotionInfo.creator}}</td>
+                    <td colspan="3" class="col_title">更新用户：</td>
+                    <td colspan="5">{{promotionInfo.updator}}</td>
+                    <td colspan="3" class="col_title">状态：</td>
+                    <td colspan="5">{{promotionInfo.status}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="col_title">创建时间：</td>
+                    <td colspan="5">{{promotionInfo.createTime}}</td>
+                    <td colspan="3" class="col_title">更新时间：</td>
+                    <td colspan="5">{{promotionInfo.updateTime}}</td>
+                    <td colspan="3" class="col_title">审核员：</td>
+                    <td colspan="5">{{promotionInfo.auditor}}</td>
+                </tr>
+
+                </tbody>
+                <tbody v-if="promotionInfo.promotionType==1">
+                <tr>
+                    <th colspan="24" style="line-height: 30px;font-size: 16px;font-weight: bold;padding-top: 10px">
+                        拼团模板
+                    </th>
+                </tr>
+                <tr>
+                    <td colspan="3" class="col_title">拼团模板名称：</td>
+                    <td colspan="21">{{promotionInfo.rule.groupName}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="col_title">团类型：</td>
+                    <td colspan="9">{{promotionInfo.rule.groupType}}</td>
+                    <td colspan="3" class="col_title">{{promotionInfo.rule.groupType==1?"邀请限制：":""}}</td>
+                    <td colspan="9">{{promotionInfo.rule.onlyNew}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="col_title">成团条件：</td>
+                    <td colspan="9">{{promotionInfo.rule.groupCondition}}</td>
+                    <td colspan="3" class="col_title">成功数量：</td>
+                    <td colspan="9">{{promotionInfo.rule.minSuccessNum}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="col_title">最大开团数量：</td>
+                    <td colspan="9">{{promotionInfo.rule.maxGroupNum==-1?"无限制":promotionInfo.rule.maxGroupNum}}</td>
+                    <td colspan="3" class="col_title">团长返利金额：</td>
+                    <td colspan="9">{{promotionInfo.rule.shareTitle}}元</td>
+                </tr>
+                </tbody>
+
+                <tbody>
+                <tr>
+                    <th colspan="24" style="line-height: 30px;font-size: 16px;font-weight: bold;padding-top: 10px">
+                        商品列表
+                    </th>
+                </tr>
+                <tr>
+                    <td colspan="4" style="text-align: center" class="col_title">商品名称</td>
+                    <td colspan="4" style="text-align: center" class="col_title">商品编号</td>
+                    <td colspan="4" style="text-align: center" class="col_title">商品价格</td>
+                    <td colspan="4" style="text-align: center" class="col_title">单份数量</td>
+                    <td colspan="4" style="text-align: center" class="col_title">参与活动数量类型</td>
+                    <td colspan="4" style="text-align: center" class="col_title">数量</td>
+                </tr>
+                <tr v-for="(item,index) in promotionInfo.items">
+                    <td colspan="4">{{item.itemName}}</td>
+                    <td colspan="4">{{item.itemNo}}</td>
+                    <td colspan="4">原价:<s>{{item.retailPrice}}</s>元　促销价:{{item.promotionPrice}}元</td>
+                    <td colspan="4">{{item.itemNum}}</td>
+                    <td colspan="4">{{item.totalItemType}}</td>
+                    <td colspan="4">{{item.totalItemNum}}</td>
+                </tr>
+                </tbody>
+            </table>
+
+
+        </div>
+    </Drawer>
+</div>
+<div th:replace="common/script::footer_script"></div>
+<script type="text/babel" th:src="${staticUrl}+'/promotion/js/promotion.js'"></script>
+</body>
+</html>

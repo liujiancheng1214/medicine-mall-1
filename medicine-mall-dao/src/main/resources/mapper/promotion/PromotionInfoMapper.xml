@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.jdcloud.medicine.mall.dao.promotion.PromotionInfoMapper">
+    <select id="getOne" resultType="cn.jdcloud.medicine.mall.domain.promotion.PromotionInfoResult">
+        select t1.*,t2.*
+        from t_promotion_info t1
+        left join t_promotion_group t2
+        on t1.promotion_id = t2.id
+        where
+        t1.promotion_id = #{promotionId}
+    </select>
+    
+    <select id="queryPromotionInfo" resultType="cn.jdcloud.medicine.mall.domain.promotion.PromotionInfoDto">
+        select 
+	        b.group_condition groupCondition,
+	        b.min_success_num minSuccessNum,
+	        a.end_time endTime,c.`status` status,
+	        c.item_num itemNum,c.user_num userNum,
+	        a.promotion_id promotionId
+        from  t_promotion_info a,t_promotion_group b ,t_group_info c
+        where b.id=a.promotion_group_id and a.promotion_id=c.promotion_id
+        and a.promotion_id=#{promotionId}
+    
+    
+    </select>
+    
+    
+</mapper>

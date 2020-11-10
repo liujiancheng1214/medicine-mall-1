@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.jdcloud.medicine.mall.dao.promotion.GroupInfoMapper">
+
+    <sql id="Example_Where_Clause">
+        <where>
+            1=1
+            <if test="groupInfoDto.status != null and groupInfoDto.status != ''">
+                and tgi.status = #{groupInfoDto.status}
+            </if>
+            <if test="groupInfoDto.startTime != null  and groupInfoDto.startTime != ''
+            and groupInfoDto.endTime != null and groupInfoDto.endTime != ''">
+                and tu.create_time between #{groupInfoDto.startTime} and #{groupInfoDto.endTime}
+            </if>
+            <if test="groupInfoDto.promotionId != null and groupInfoDto.promotionId != ''">
+                and tgi.promotion_id = #{groupInfoDto.promotionId}
+            </if>
+            <if test="groupInfoDto.keyWord != null and groupInfoDto.keyWord != ''">
+                and tu.company_name like concat('%',#{groupInfoDto.keyWord},'%')
+                or tu.mobile like concat('%',#{groupInfoDto.keyWord},'%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="listGroupInfo" resultType="cn.jdcloud.medicine.mall.domain.promotion.GroupInfoResult">
+        select tgi.*,
+        IF(tgi.plush_type=1,a.name,tu.company_name) as plushUserName,
+        IF(tgi.plush_type=1,a.mobile,tu.mobile) as plushUserPhone,
+        tpi.promotion_name as promotionName
+        from t_group_info tgi
+        left join t_user tu on tgi.plush_user_id = tu.id AND tgi.plush_type = 2
+        left join s_admin a on tgi.plush_user_id = a.id AND tgi.plush_type = 1
+        left join t_promotion_info tpi on tgi.promotion_id = tpi.promotion_id
+        <include refid="Example_Where_Clause"/>
+        order by tu.create_time desc
+    </select>
+
+    <select id="listCount" resultType="java.lang.Integer">
+        select count(*)
+        from t_group_info tgi
+        left join t_user tu on tgi.plush_user_id = tu.id
+        left join t_promotion_info tpi on tgi.promotion_id = tpi.promotion_id
+        <include refid="Example_Where_Clause"/>
+    </select>
+
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jdcloud.medicine.mall.dao.order.RefundOrderInfoMapper" >
+
+    <resultMap id="RefundOrderInfoDto" type="cn.jdcloud.medicine.mall.domain.order.dto.RefundOrderInfoDto">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="refund_order_id" jdbcType="INTEGER" property="refundOrderId" />
+        <result column="item_id" jdbcType="INTEGER" property="itemId" />
+        <result column="item_num" jdbcType="INTEGER" property="itemNum" />
+        <result column="item_name" jdbcType="VARCHAR" property="itemName" />
+        <result column="item_icon" jdbcType="VARCHAR" property="itemIcon" />
+        <result column="item_price" jdbcType="DECIMAL" property="itemPrice" />
+        <result column="total_price" jdbcType="DECIMAL" property="totalPrice" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+        <result column="item_no" jdbcType="VARCHAR" property="itemNo" />
+        <result column="help_code" jdbcType="VARCHAR" property="helpCode" />
+        <result column="spec" jdbcType="VARCHAR" property="spec" />
+        <result column="factory" jdbcType="VARCHAR" property="factory" />
+        <result column="unit" jdbcType="VARCHAR" property="unit" />
+        <result column="approval_no" jdbcType="VARCHAR" property="approvalNo" />
+        <result column="expiry_date" jdbcType="INTEGER" property="expiryDate" />
+        <result column="qty" jdbcType="INTEGER" property="qty" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, refund_order_id, item_id, item_num, item_name, item_icon, item_price, total_price,
+        create_time, update_time
+    </sql>
+    <select id = "selectInfoDtoByRefundOrderId" parameterType="string" resultMap="RefundOrderInfoDto" >
+        SELECT
+            t1.*,
+            t2.item_no,
+            t2.help_code,
+            t2.spec,
+            t2.factory,
+            t2.unit,
+            t2.approval_no,
+            t2.expiry_date,
+            t2.qty
+        FROM t_refund_order_info t1
+        LEFT JOIN t_item t2 ON t1.item_id = t2.id
+        WHERE t1.refund_order_id = #{refundOrderId}
+    </select>
+</mapper>

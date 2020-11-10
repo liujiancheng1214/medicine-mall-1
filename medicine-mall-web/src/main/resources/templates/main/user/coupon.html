@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="common/header::common_head"/>
+    <link rel="stylesheet" th:href="${staticUrl} + '/main/css/sys/coupon.css'">
+</head>
+<body>
+<div id="sys_coupon" v-cloak>
+    <Tabs type="card" v-model="couponType" style="padding: 20px 10px 0px 10px" @on-click="refresh">
+        <Tab-pane label="全部" name=""></Tab-pane>
+        <Tab-pane label="代金券" name="1"></Tab-pane>
+        <Tab-pane label="折扣券" name="2"></Tab-pane>
+        <Tab-pane label="满减券" name="3"></Tab-pane>
+    </Tabs>
+    <div id="btn-action-group">
+        <i-button type="success" @click="addItem" shape="circle">新增类别</i-button>
+        <i-button type="info" style="margin-left: 10px;" @click="refresh" shape="circle">刷新</i-button>
+    </div>
+    <i-table id="list" border :columns="columns1" :data="couponList" @on-select="select"
+             @on-select-all="selectAll" @on-selection-change="selectChange"></i-table>
+    <div style="margin: 10px;overflow: hidden">
+        <div style="float: right;">
+            <Page show-sizer @on-page-size-change="pageSizeChange" :page-size-opts="pageSizeOpts"
+                  @on-change="pageChange" :total="total" :current="current" :page-size="size" :show-total="true"></Page>
+        </div>
+    </div>
+    <Drawer
+            v-bind:title="drawerTitle"
+            v-model="showEdit"
+            width="100"
+            :mask-closable="false"
+            @on-close="emptyForm"
+    >
+        <i-form ref="editForm" :model="newItem" :label-width="120" :rules="ruleValidate">
+            <div style="padding-left: 50px">
+                <Form-item label="优惠券名" prop="title"
+                           :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                    <i-input style="width: 400px" placeholder="请输入优惠券名"
+                             v-model="newItem.title"></i-input>
+                </Form-item>
+                <Form-item label="优惠券类型" prop="type"
+                           :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                    <i-select :model.sync="model3" style="width:200px" v-model="newItem.type"
+                              @on-change="typeChange">
+                        <i-option v-for="item in typeList" :value="item.value">{{ item.label }}</i-option>
+                    </i-select>
+                </Form-item>
+                <Form-item label="优惠面额" prop="discountAmount">
+                    <i-input style="width: 400px" number placeholder="请输入/折扣率/满减额"
+                             v-model="newItem.discountAmount"></i-input>&nbsp;&nbsp;元
+                </Form-item>
+                <Form-item label="满减金额" prop="discountLimitAmount" v-if="showAmount">
+                    <i-input style="width: 400px" number placeholder="请输入最低消费金额"
+                             v-model="newItem.discountLimitAmount"></i-input>&nbsp;&nbsp;元
+                </Form-item>
+                <Form-item label="是否可以转赠" prop="isHandsel"
+                           :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                    <i-select :model.sync="model1" style="width:200px" v-model="newItem.isHandsel">
+                        <i-option v-for="item in handList" :value="item.value">{{ item.label }}</i-option>
+                    </i-select>
+                </Form-item>
+                <Form-item label="能否叠加使用" prop="isForbidOverlayPreferential">
+                    <i-select :model.sync="model2" style="width:200px" v-model="newItem.isForbidOverlayPreferential">
+                        <i-option v-for="item in forbidList" :value="item.value">{{ item.label }}</i-option>
+                    </i-select>
+                </Form-item>
+                <Form-item label="使用规则" prop="description">
+                    <i-input type="textarea" :rows="3" style="width: 400px"
+                             placeholder="请输入优惠券使用规则" v-model="newItem.description"></i-input>
+                </Form-item>
+                <Form-item label="有效天数" prop="expireDays">
+                    <i-input style="width: 400px" number placeholder="请输入优惠券有效天数"
+                             v-model="newItem.expireDays"></i-input>&nbsp;&nbsp;天
+                </Form-item>
+                <Form-item label="过期提前通知天数" prop="expireNoticeDays">
+                    <i-input style="width: 400px" number placeholder="请输入过期提前通知天数"
+                             v-model="newItem.expireNoticeDays"></i-input>&nbsp;&nbsp;天
+                </Form-item>
+                <Form-item label="用户可领张数" prop="limitNum">
+                    <i-input style="width: 400px" number placeholder="请输入用户最多可领取张数"
+                             v-model="newItem.limitNum"></i-input>&nbsp;&nbsp;张
+                </Form-item>
+            </div>
+            <Row>
+                <i-col span="3" offset="3">
+                    <i-button type="primary" style="width: 150px" @click="saveItem">提交</i-button>
+                </i-col>
+                <i-col span="3" offset="2">
+                    <i-button style="width: 150px" @click="reset">重置</i-button>
+                </i-col>
+            </Row>
+        </i-form>
+    </Drawer>
+    <Drawer
+            title="发放优惠券"
+            v-model="search_modal"
+            width="100"
+            :mask-closable="false"
+            @on-close="emptyFormItem"
+    >
+        <i-form ref="searchForm" :label-width="110">
+            <div style="padding-left: 50px">
+                <Form-item label="优惠券名" style="width:500px;">
+                    <span style="font-weight: bold;font-size: 15px;">{{couponTitle}}</span>
+                </Form-item>
+                <Form-item label="发送对象" style="width:500px"
+                           :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                    <i-select :model.sync="model4" v-model="sendType" @on-change="changeType">
+                        <i-option v-for="item in typeList1" :value="item.value">{{ item.label }}</i-option>
+                    </i-select>
+                </Form-item>
+                <Form-item label="选择客户" style="width:500px" v-if="showUserSelect"
+                           :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                    <i-select ref="userSearchList" :model.sync="model4"
+                              filterable multiple clearable @on-change="changeUser">
+                        <i-option v-for="item in userList" :value="item.value">{{ item.label }}</i-option>
+                    </i-select>
+                </Form-item>
+            </div>
+            <Row>
+                <i-col span="3" offset="3">
+                    <i-button type="primary" style="width: 140px" @click="searchSubmit">立即发放</i-button>
+                </i-col>
+                <i-col span="3" offset="1">
+                    <i-button style="width: 140px" @click="cancel">取消</i-button>
+                </i-col>
+            </Row>
+        </i-form>
+    </Drawer>
+</div>
+<div th:replace="common/script::footer_script"></div>
+<script type="text/babel" th:src="${staticUrl}+'/main/js/sys/coupon.js'"></script>
+</body>
+</html>

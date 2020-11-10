@@ -1,0 +1,44 @@
+#order_list{
+    padding: 20px;
+}
+.btn-action-group{
+    margin-top: 5px;
+    margin-left: 5px;
+}
+.page{
+    float: right;
+    margin-top: 5px;
+}
+.table{
+    margin-top: 5px;
+}
+.ivu-tabs > .ivu-tabs-bar {
+    margin-left: 0;
+}
+.ivu-table th.ivu-table-column-center {
+    font-size: 15px;
+    font-weight: bold;
+}
+.ivu-table th.ivu-table-column-left {
+    font-size: 15px;
+    font-weight: bold;
+}
+.ivu-table-cell {
+     padding: 0
+}
+
+/*#pagenation{*/
+/*    float: right;*/
+/*    position: fixed;*/
+/*    bottom: 2%;*/
+/*    right: 5%;*/
+/*}*/
+
+/*#changeRoleModal{*/
+/*    width: 60%;*/
+/*    !* top: 0px; *!*/
+/*    height: 90%;*/
+/*}*/
+/*#changeRoleModal .ivu-modal-content{*/
+/*    height: 100%;*/
+/*}*/

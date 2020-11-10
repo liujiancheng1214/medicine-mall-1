@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jdcloud.medicine.mall.dao.order.OrderPayMapper" >
+  <resultMap id="OrderPayMap" type="cn.jdcloud.medicine.mall.domain.order.OrderPay" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="related_id" property="relatedId" jdbcType="VARCHAR" />
+    <result column="open_id" property="openId" jdbcType="VARCHAR" />
+    <result column="subject" property="subject" jdbcType="VARCHAR" />
+    <result column="body" property="body" jdbcType="VARCHAR" />
+    <result column="trade_amount" property="tradeAmount" jdbcType="DECIMAL" />
+    <result column="pay_amount" property="payAmount" jdbcType="DECIMAL" />
+    <result column="pay_way" property="payWay" jdbcType="VARCHAR" />
+    <result column="pay_type" property="payType" />
+    <result column="client_type" property="clientType" />
+    <result column="extra_params" property="extraParams" />
+    <result column="time_out" property="timeOut" jdbcType="TIMESTAMP" />
+    <result column="trade_no" property="tradeNo" jdbcType="VARCHAR" />
+    <result column="pay_code" property="payCode" jdbcType="VARCHAR" />
+    <result column="pay_status" property="payStatus" jdbcType="TINYINT" />
+    <result column="callback_time" property="callbackTime" jdbcType="TIMESTAMP" />
+    <result column="succ_time" property="succTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+    <sql id="all_column" >
+        id, related_id,open_id,subject, body, trade_amount, pay_amount, pay_way, pay_type, client_type,
+        extra_params, time_out, trade_no,pay_code, pay_status, callback_time, succ_time,
+        create_time,update_time
+    </sql>
+
+  <insert id="saveOrderPay" parameterType="cn.jdcloud.medicine.mall.domain.order.OrderPay" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO t_order_pay (related_id,open_id,subject, body, trade_amount, pay_amount,
+      pay_way, pay_type, client_type, extra_params, time_out, trade_no, pay_code, pay_status, callback_time, succ_time, create_time, update_time)
+    VALUES (#{relatedId},#{openId}, #{subject}, #{body}, #{tradeAmount}, #{payAmount},
+    #{payWay}, #{payType}, #{clientType}, #{extraParams}, #{timeOut}, #{tradeNo}, #{payCode}, #{payStatus}, #{callbackTime}, #{succTime}, #{createTime}, now())
+  </insert>
+
+  <update id="updateOrderPay" parameterType="cn.jdcloud.medicine.mall.domain.order.OrderPay">
+      UPDATE t_order_pay
+      SET
+      <if test="subject != null">
+          subject = #{subject},
+      </if>
+      <if test="openId != null">
+          open_id = #{openId},
+      </if>
+      <if test="body != null">
+          body = #{body},
+      </if>
+      <if test="tradeAmount != null">
+          trade_amount = #{tradeAmount},
+      </if>
+      <if test="payAmount != null">
+          pay_amount = #{payAmount},
+      </if>
+      <if test="payWay != null">
+          pay_way = #{payWay},
+      </if>
+      <if test="timeOut != null">
+          time_out = #{timeOut},
+      </if>
+      <if test="tradeNo != null">
+          trade_no = #{tradeNo},
+      </if>
+      <if test="payCode != null">
+          pay_code = #{payCode},
+      </if>
+      <if test="payStatus != null">
+          pay_status = #{payStatus},
+      </if>
+      <if test="callbackTime != null">
+          callback_time = #{callbackTime},
+      </if>
+      <if test="succTime != null">
+          succ_time = #{succTime},
+      </if>
+      update_time = now()
+      WHERE id = #{id}
+  </update>
+
+    <update id="updateNotifyOrderPay" parameterType="cn.jdcloud.medicine.mall.domain.order.OrderPay">
+        UPDATE t_order_pay
+        SET pay_amount = #{payAmount},trade_no = #{tradeNo},
+            pay_code = #{payCode},pay_status = #{payStatus},callback_time = #{callbackTime},
+            succ_time = #{succTime}
+        WHERE id = #{id}
+    </update>
+
+  <delete id="deleteOrderPay" parameterType="java.lang.Integer">
+      DELETE FROM t_order_pay WHERE id=#{orderPayId}
+  </delete>
+
+    <select id="getOrderPayById" resultMap="OrderPayMap">
+        SELECT <include refid="all_column" />
+        FROM t_order_pay
+        WHERE id = #{id}
+    </select>
+
+    <select id="getByRelatedId" resultMap="OrderPayMap">
+        SELECT <include refid="all_column" />
+        FROM t_order_pay
+        WHERE related_id = #{relatedId} and pay_type=#{payType}
+        order by create_time desc limit 1
+    </select>
+
+    <select id="getSuccessOrderPay" resultMap="OrderPayMap">
+        SELECT <include refid="all_column" />
+        FROM t_order_pay
+        WHERE related_id = #{relatedId} and pay_type=#{payType}
+        AND (pay_status = 3 or pay_status = 4) limit 1
+    </select>
+</mapper>

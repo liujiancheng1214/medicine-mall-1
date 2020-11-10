@@ -1,0 +1,15 @@
+.modulesTab,
+.ivu-tabs,
+.ivu-tabs-content > .ivu-tabs-tabpane {
+  height: 100%;
+}
+.ivu-tabs > .ivu-tabs-bar {
+  margin-bottom: 0;
+  margin-left: 10px;
+}
+.modulesTab {
+  padding-top: 10px;
+}
+.ivu-tabs-content {
+  height: calc(100% - 36px);
+}

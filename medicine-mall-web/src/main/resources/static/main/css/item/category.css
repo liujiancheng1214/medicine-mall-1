@@ -1,0 +1,23 @@
+[v-cloak]{
+    display: none;
+}
+.ivu-table-cell {
+    padding: 0 !important;
+}
+.btn-action-group{
+    margin-left: 10px;
+    margin-top: 10px;
+}
+.categoryList{
+    margin-top: 10px;
+}
+.categoryPage{
+    float: right;
+    padding: 5px 10px;
+}
+.ivu-tree-children{
+    font-size: 18px;
+}
+.categoryTree{
+    padding: 10px 30px;
+}

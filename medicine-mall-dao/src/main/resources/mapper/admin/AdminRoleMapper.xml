@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jdcloud.medicine.mall.dao.admin.AdminRoleMapper" >
+  <resultMap id="BaseResultMap" type="cn.jdcloud.medicine.mall.domain.admin.AdminRole" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="admin_id" property="adminId" jdbcType="INTEGER" />
+    <result column="role_id" property="roleId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, admin_id, role_id, create_time
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from s_admin_role
+    where id = #{id}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from s_admin_role
+    where id = #{id}
+  </delete>
+
+  <insert id="insert" parameterType="cn.jdcloud.medicine.mall.domain.admin.AdminRole" >
+    insert into s_admin_role (
+      admin_id,
+      role_id,
+      create_time)
+    values (
+      #{adminId},
+      #{roleId},
+      now())
+  </insert>
+
+  <insert id="insertSelective" parameterType="cn.jdcloud.medicine.mall.domain.admin.AdminRole" >
+    insert into s_admin_role
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="adminId != null" >
+        admin_id,
+      </if>
+      <if test="roleId != null" >
+        role_id,
+      </if>
+      <if test="createTime != null" >
+        create_time
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id},
+      </if>
+      <if test="adminId != null" >
+        #{adminId},
+      </if>
+      <if test="roleId != null" >
+        #{roleId},
+      </if>
+      <if test="createTime != null" >
+        #{createTime}
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.jdcloud.medicine.mall.domain.admin.AdminRole" >
+    update s_admin_role
+    <set >
+      <if test="adminId != null" >
+        admin_id = #{adminId},
+      </if>
+      <if test="roleId != null" >
+        role_id = #{roleId},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime}
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.jdcloud.medicine.mall.domain.admin.AdminRole" >
+    update s_admin_role
+    set admin_id = #{adminId},
+      role_id = #{roleId},
+      create_time = #{createTime}
+    where id = #{id}
+  </update>
+
+  <select id="listAdminRoles" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+        t2.role_code,
+        t1.id,
+        t1.role_id,
+        t1.admin_id
+    from s_admin_role t1
+      inner join s_role t2
+    on t1.role_id = t2.id
+    where t1.admin_id = #{adminId}
+  </select>
+
+  <delete id="deleteByAdminId">
+    delete from s_admin_role  where admin_id = #{adminId}
+  </delete>
+
+  <insert id="insertBatch">
+       insert into s_admin_role(
+        admin_id,
+        role_id,
+        create_time
+        )
+        VALUES
+      <foreach collection="list" item="item" separator=",">
+        (#{item.adminId},#{item.roleId},now())
+      </foreach>
+  </insert>
+
+</mapper>

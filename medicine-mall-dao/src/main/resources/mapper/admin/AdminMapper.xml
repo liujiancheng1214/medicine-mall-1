@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jdcloud.medicine.mall.dao.admin.AdminMapper" >
+
+  <resultMap id="BaseResultMap" type="cn.jdcloud.medicine.mall.domain.admin.Admin" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="account" property="account" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="head_img" property="headImg" jdbcType="VARCHAR" />
+    <result column="last_login_time" property="lastLoginTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="mobile" property="mobile" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, account, name, password, head_img, last_login_time, create_time, update_time, mobile
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from s_admin
+    where id = #{id}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from s_admin
+    where id = #{id}
+  </delete>
+
+
+  <insert id="insertSelective" parameterType="cn.jdcloud.medicine.mall.domain.admin.Admin" >
+    insert into s_admin
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="account != null" >
+        account,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="headImg != null" >
+        head_img,
+      </if>
+      <if test="lastLoginTime != null" >
+        last_login_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id},
+      </if>
+      <if test="account != null" >
+        #{account},
+      </if>
+      <if test="name != null" >
+        #{name},
+      </if>
+      <if test="password != null" >
+        #{password},
+      </if>
+      <if test="headImg != null" >
+        #{headImg},
+      </if>
+      <if test="lastLoginTime != null" >
+        #{lastLoginTime},
+      </if>
+      <if test="createTime != null" >
+        #{createTime},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="cn.jdcloud.medicine.mall.domain.admin.Admin" >
+    update s_admin
+    <set >
+      <if test="account != null" >
+        account = #{account},
+      </if>
+      <if test="name != null" >
+        name = #{name},
+      </if>
+      <if test="password != null" >
+        password = #{password},
+      </if>
+      <if test="headImg != null" >
+        head_img = #{headImg},
+      </if>
+      <if test="lastLoginTime != null" >
+        last_login_time = #{lastLoginTime},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="cn.jdcloud.medicine.mall.domain.admin.Admin" >
+    update s_admin
+    set account = #{account},
+        name = #{name},
+        mobile=#{mobile}
+    where id = #{id}
+  </update>
+
+  <delete id="deleteByMobile">
+    delete from s_admin  where mobile = #{mobile}
+  </delete>
+
+  <!--列举所有的后台管理员-->
+  <select id="listAll" resultMap="BaseResultMap" >
+    select
+      <include refid="Base_Column_List" />
+    from s_admin t
+    where t.status = 0
+    <if test="admin.account!=null and admin.account!=''">
+        and t.account like concat('%',#{admin.account},'%')
+    </if>
+
+    <if test="admin.name!=null and admin.name!=''">
+      and t.name like concat('%',#{admin.name},'%')
+    </if>
+    and t.id != 1
+    order by t.create_time desc
+  </select>
+
+  <!--@author qun.xu @desc 更新最后一次登录时间-->
+  <update id="updateLastLoginTime">
+    update s_admin  t
+    set   t.last_login_time = now()
+    where t.id = #{adminId}
+  </update>
+  <!--根据占股查询用户-->
+  <select id="getByAccount" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List" />
+    from s_admin t
+    where t.account = #{account}
+  </select>
+  <!--更新管理员的状态-->
+  <update id="updateStatus">
+  update s_admin t
+  set t.status = #{status}
+  where t.id = ${adminId}
+  </update>
+  <!--新增admin-->
+  <insert id="insert" parameterType="cn.jdcloud.medicine.mall.domain.admin.Admin" useGeneratedKeys="true" keyProperty="id">
+    insert into s_admin
+     (
+      account,
+      name,
+      password,
+      head_img,
+      create_time,
+      mobile)
+    values (
+      #{account},
+      #{name},
+      #{password},
+      #{headImg},
+      now(),
+      #{mobile}
+      )
+  </insert>
+
+  <!--更新密码-->
+  <update id="updatePassword" parameterType="cn.jdcloud.medicine.mall.domain.admin.Admin">
+      update s_admin  t set t.password = #{password} where t.id = #{id}
+  </update>
+
+  <select id="selectByMobile" resultMap="BaseResultMap" >
+    select
+      <include refid="Base_Column_List" />
+    from s_admin t
+    where t.mobile = #{mobile}
+  </select>
+
+
+
+</mapper>

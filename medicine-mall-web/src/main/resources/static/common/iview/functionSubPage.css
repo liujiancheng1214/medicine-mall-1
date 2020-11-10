@@ -1,0 +1,45 @@
+body,
+html {
+  height: 100%;
+}
+body {
+  background-color: #0E5FAC;
+}
+.Tab-box {
+  width: 1136px;
+  padding: 42px 0;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.Tab-box > .mod-box {
+  width: 142px;
+  height: 194px;
+  float: left;
+  color: white;
+  text-align: center;
+  font-size: 18px;
+  padding: 25px 0;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  -webkit-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+}
+.Tab-box > .mod-box > .mod-icon {
+  width: 95px;
+  height: 95px;
+  margin: 0 auto 20px;
+}
+.Tab-box > .mod-box > .mod-icon > img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.Tab-box > .mod-box:hover {
+  transform: scale(1.2, 1.2);
+  -ms-transform: scale(1.2, 1.2);
+  -moz-transform: scale(1.2, 1.2);
+  -webkit-transform: scale(1.2, 1.2);
+  -o-transform: scale(1.2, 1.2);
+}

@@ -1,0 +1,15 @@
+#btn-action-group{
+    padding: 20px;
+}
+
+[v-cloak] {
+    display: none;
+}
+.ivu-table .ivu-table-header .ivu-table-cell {
+    font-size: 13px;
+    font-weight: bold;
+}
+.ivu-table .ivu-table-header .ivu-table-column-left{
+    text-align: center;
+}
+

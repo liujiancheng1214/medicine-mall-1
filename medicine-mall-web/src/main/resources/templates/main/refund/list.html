@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--    <title th:text="${platform.name}">IS智慧平台云联盟</title>-->
+    <th:block th:include="common/header::common_head"/>
+    <link rel="stylesheet" th:href="${staticUrl} + '/main/css/refund/list.css'">
+</head>
+<body>
+<div id="refund_order_list" v-cloak>
+    <!--    <template>-->
+    <div id="btn-action-group">
+        <Row type="flex" align="middle" >
+            <i-col style="width:120px;"><div>搜索关键字：</div></i-col>
+            <i-col span="2" style="width: 20%;margin-right:30px">
+                <i-input :search="true" placeholder="订单编号/客户的编号/客户手机号码" v-model="searchVar"
+                         @on-search="search" style="width:100%"/>
+            </i-col>
+
+            <i-col style="width:80px;"><div>下单时间：</div></i-col>
+            <i-col span="6" style="width: 18%;margin-right:30px">
+                <date-picker v-model="orderTime" format="yyyy-MM-dd HH:mm:ss" type="datetimerange" :clearable="false" :confirm="true" :editable="false"
+                             placeholder="请选择下单时间" @on-ok="search" @on-clear="clearDate" style="width:100%"></date-picker>
+            </i-col>
+            <i-col style="width:80px;"><div>退款时间：</div></i-col>
+            <i-col span="6" style="width: 18%;margin-right:30px">
+                <date-picker v-model="refundTime" format="yyyy-MM-dd HH:mm:ss" type="datetimerange" :clearable="false" :confirm="true" :editable="false"
+                             placeholder="请选择退款时间" @on-ok="search" @on-clear="clearDate" style="width:100%"></date-picker>
+            </i-col>
+            <i-col>
+                <Dropdown  v-if="tabIndex==4"  @on-click="operate" >
+                    <i-button type="primary" >
+                        操作
+                        <Icon type="ios-arrow-down"></Icon>
+                    </i-button>
+                    <Dropdown-menu slot="list">
+                        <Dropdown-item name="1">批量审核通过退款</Dropdown-item>
+                        <Dropdown-item name="2">拒绝退款</Dropdown-item>
+                    </Dropdown-menu>
+                </Dropdown>
+<!--                <i-button @click="value1 = !value1">高级搜索</i-button>-->
+            </i-col>
+
+
+        </Row>
+        <Row v-show = "value1" style="margin-top: 5px">
+            <i-col span="2">结算状态：</i-col>
+            <i-col span="3">
+                <i-select v-model="settleStatus" @on-change="settleStatusSelectChange" not-found-text="没有选项" placeholder="全部">
+                    <i-option v-for="item in settleStatusList" :value="item.value" :key="item.value">{{ item.name }}</i-option>
+                </i-select>
+            </i-col>
+            <i-col span="2" style="margin-left: 20px">退款原因：</i-col>
+            <i-col span="4" >
+                <i-select v-model="refundReason" @on-change="settleStatusSelectChange" not-found-text="没有选项" placeholder="全部">
+                    <i-option v-for="item in refundReasonList" :value="item.value" :key="item.value">{{ item.name }}</i-option>
+                </i-select>
+            </i-col>
+            <i-col span="2" style="margin-left: 20px">订单类型：</i-col>
+            <i-col span="4" >
+                <i-select v-model="deliveryType" @on-change="settleStatusSelectChange" not-found-text="没有选项" placeholder="全部">
+                    <i-option v-for="item in deliveryTypeList" :value="item.value" :key="item.value">{{ item.name }}</i-option>
+                </i-select>
+            </i-col>
+        </Row>
+<!--        <transition name = "fade">-->
+
+<!--        </transition>-->
+
+    </div>
+    <tabs class="tabs" v-model="tabIndex" type="card" @on-click="changeTab">
+        <tab-pane :label="label1" name="3"></tab-pane>
+        <tab-pane :label="label2" name="4"></tab-pane>
+        <tab-pane :label="label3" name="5"></tab-pane>
+        <tab-pane :label="label4" name="6"></tab-pane>
+        <tab-pane :label="label5" name="7"></tab-pane>
+        <tab-pane :label="label6" name="8"></tab-pane>
+    </tabs>
+    <i-table :loading="loading" stripe border :columns="tableHead" :data="orderList" ref="table" :height="tableHeight"
+             :show-summary="true" @on-selection-change="getSelection"></i-table>
+    <div style="margin: 10px;overflow: hidden;float: right">
+        <Page @on-change="pageChange" :total="page.total" show-total :current="page.current"
+              transfer="true" show-sizer @on-page-size-change="pageSizeChange"></Page>
+    </div>
+</div>
+<div th:replace="common/script::footer_script"></div>
+<script type="text/babel" th:src="${staticUrl} + '/common/axios/download.js?version=' + ${version}"></script>
+<script type="text/babel" th:src="${staticUrl}+'/main/js/refund/list.js'"></script>
+</body>
+</html>

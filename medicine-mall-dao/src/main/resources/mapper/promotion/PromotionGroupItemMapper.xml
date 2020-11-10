@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.jdcloud.medicine.mall.dao.promotion.PromotionGroupItemMapper">
+
+
+
+  <select id="listPromotionItemUser" resultType="cn.jdcloud.medicine.mall.domain.promotion.PromotionItemUserDto">
+  select 
+        c.id user_id ,c.head_img,c.company_name name,a.id group_id ,
+        c.mobile mobile ,b.create_time create_time
+  from t_group_info a ,t_group_user b,t_user c 
+  where  a.id =b.group_id and b.user_id=c.id
+         and a.promotion_id =#{promotionId}  and a.status=1 
+         and b.is_pay=3
+         order by b.create_time desc
+  </select>
+
+
+  <select id="listPromotionItems"  resultType="cn.jdcloud.medicine.mall.domain.promotion.PromotionItemListDto">
+      select  
+      a.promotion_id , c.id  item_id,
+      c.item_no,c.item_name,c.img_cover ,
+      c.subtotal_sale_num, a.item_group_price,
+      c.effective_date ,c.factory ,c.retail_price retail_price
+    from  
+      t_promotion_group_item a,t_promotion_info b,t_item  c
+    where a.promotion_id=b.promotion_id and a.item_no=c.item_no
+    and b.end_time>now()  and b.status=1 and b.is_deleted=0
+    <if test="promotionIds != null and promotionIds != ''">
+       and  a.promotion_id in
+        <foreach item="item" collection="promotionIds" separator="," open="(" close=")" index="">
+             #{item}
+     </foreach>
+     </if>
+     <if test="itemNo != null and itemNo != ''">
+        and c.item_no=${itemNo}
+     </if>
+      <if test="itemName != null and itemName != ''">
+       and  c.item_name like '%${itemName}%'
+     </if>
+       <if test="itemBrandName != null and itemBrandName != ''">
+       and  c.item_brand_id in(
+        select  id  from t_item_brand where ibrand_name like '%${itemBrandName}%' 
+        )
+     </if>
+     <!-- 排序规则  1：价格升序 2 价格降序 3 有效期升序 4 有效期降序 -->
+       <if test="sortType != null and sortType == 1">
+          order by a.item_group_price 
+      </if>
+      <if test="sortType != null and sortType == 2">
+          order by a.item_group_price  desc 
+      </if>
+   
+    <if test="sortType != null and sortType == 3">
+          order by c.effective_date
+      </if>
+       <if test="sortType != null and sortType == 4">
+          order by c.effective_date  desc
+      </if>
+  </select>
+
+  <select id="checkItemIsPromotionItem" resultType="int">
+     select 
+     count(1) sl
+     from  
+     t_promotion_group_item a,t_promotion_info b
+      where a.promotion_id=b.promotion_id
+      and a.item_no=#{itemNo}
+      and b.end_time>now()
+      and b.status=1 and b.is_deleted=0
+  </select>
+
+
+    <insert id="insertBatch">
+        insert into t_promotion_group_item
+        (
+        promotion_id,
+        item_no,
+        item_group_price,
+        item_num,
+        create_time,
+        total_item_type,
+        total_item_num,
+        total_item_qty
+        )values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.promotionId},
+            #{item.itemNo},
+            #{item.itemGroupPrice},
+            #{item.itemNum},
+            #{item.createTime},
+            #{item.totalItemType},
+            #{item.totalItemNum},
+            #{item.totalItemQty}
+            )
+        </foreach>
+    </insert>
+    <select id="PromotionGroupItemInfo" resultType="cn.jdcloud.medicine.mall.domain.promotion.PromotionItem">
+        select
+        t1.item_no itemNo,
+        t1.item_group_price promotionPrice,
+        t1.item_num itemNum,
+        t1.total_item_type totalItemType,
+        t1.total_item_num totalItemNum,
+        t1.total_item_qty totalItemQty,
+        t2.item_name itemName,
+        t2.retail_price retailPrice
+        from t_promotion_group_item t1
+        left join t_item t2 on t1.item_no = t2.item_no
+        where t1.promotion_id = #{promotionId}
+    </select>
+</mapper>

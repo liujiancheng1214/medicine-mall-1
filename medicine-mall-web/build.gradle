@@ -1,0 +1,40 @@
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.5'
+}
+
+buildscript {
+    repositories {
+         mavenLocal()
+        // maven{ url 'http://nexus.jdcloud.cn/repository/maven-public/'}
+        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'war'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+configurations {
+    provided
+}
+
+dependencies {
+    compile project(':medicine-mall-client')
+
+	compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+	compile("org.springframework.boot:spring-boot-starter-validation")
+	compile("org.springframework.boot:spring-boot-starter-web")
+    //redis session
+    compile("org.springframework.boot:spring-boot-starter-data-redis")
+    compile("org.springframework.session:spring-session-data-redis")
+
+    compile 'net.sourceforge.nekohtml:nekohtml:1.9.22'
+    compile("io.springfox:springfox-swagger-ui:${swagger2Version}")
+    compile("io.springfox:springfox-swagger2:${swagger2Version}")
+
+    //热部署
+    compile("org.springframework.boot:spring-boot-devtools")
+}

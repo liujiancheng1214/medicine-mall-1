@@ -1,0 +1,6 @@
+rootProject.name = 'medicine-mall'
+include 'medicine-mall-client'
+include 'medicine-mall-dao'
+include 'medicine-mall-domain'
+include 'medicine-mall-api'
+include 'medicine-mall-web'

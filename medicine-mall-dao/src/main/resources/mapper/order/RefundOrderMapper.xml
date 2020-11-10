@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jdcloud.medicine.mall.dao.order.RefundOrderMapper" >
+
+    <resultMap id="RefundOrderDto" type="cn.jdcloud.medicine.mall.domain.order.dto.RefundOrderDto">
+
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="order_id" jdbcType="VARCHAR" property="orderId" />
+        <result column="user_id" jdbcType="INTEGER" property="userId" />
+        <result column="reason" jdbcType="VARCHAR" property="reason" />
+        <result column="total_refund_amount" jdbcType="DECIMAL" property="totalRefundAmount" />
+        <result column="actual_refund_amount" jdbcType="DECIMAL" property="actualRefundAmount" />
+        <result column="total_num" jdbcType="INTEGER" property="totalNum" />
+        <result column="status" jdbcType="TINYINT" property="status" />
+        <result column="settle_status" jdbcType="TINYINT" property="settleStatus" />
+        <result column="remark_admin" jdbcType="VARCHAR" property="remarkAdmin" />
+        <result column="remark_user" jdbcType="VARCHAR" property="remarkUser" />
+        <result column="refund_type" jdbcType="TINYINT" property="refundType" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime" />
+        <result column="refund_time" jdbcType="TIMESTAMP" property="refundTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="company_name" jdbcType="VARCHAR" property="companyName" />
+        <collection property = "infoList" column="id" ofType="cn.jdcloud.medicine.mall.domain.order.dto.RefundOrderInfoDto"
+            select="cn.jdcloud.medicine.mall.dao.order.RefundOrderInfoMapper.selectInfoDtoByRefundOrderId">
+        </collection>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, order_id, user_id, reason, total_refund_amount, actual_refund_amount, total_num,
+        `status`, settle_status, remark_admin, remark_user, refund_type, create_time, apply_time,
+        refund_time, update_time
+    </sql>
+    <select id = "refundOrderPageOnAdmin" resultMap="RefundOrderDto">
+        SELECT
+            t1.`id` ,
+            t1.`order_id` ,
+            t1.`user_id` ,
+            t3.`name` AS `reason` ,
+            t1.`total_refund_amount` ,
+            t1.`actual_refund_amount`,
+            t1.`total_num` ,
+            t1.`status` ,
+            t1.`settle_status` ,
+            t1.`remark_admin`,
+            t1.`remark_user` ,
+            t1.`refund_type` ,
+            t1.`create_time`,
+            t1.`apply_time` ,
+            t1.`refund_time` ,
+            t1.`update_time` ,
+            t2.company_name
+        FROM t_refund_order t1
+        LEFT JOIN t_user t2 ON t1.user_id = t2.id
+        LEFT JOIN t_sys_dict t3 ON t1.reason = t3.`value` AND t3.type = 'REFUND_REASON'
+        <where>
+            AND t1.status = #{status,jdbcType=TINYINT}
+            <if test="search != null and search != ''" >
+                and (
+                t1.order_id like "%"#{search,jdbcType=VARCHAR}"%" /*订单编号*/
+                OR t2.mobile like "%"#{search,jdbcType=VARCHAR}"%" /*注册手机号*/
+                OR t2.contact_phone like "%"#{search,jdbcType=VARCHAR}"%"  /*联系人手机*/
+                OR t2.help_Code like "%"#{search,jdbcType=VARCHAR}"%" /*客户编号*/
+                )
+            </if>
+            <if test="settleStatus != null">
+                and t1.settle_status = #{settleStatus,jdbcType=TINYINT}
+            </if>
+            <if test="refundReason != null">
+                and t1.reason = #{refundReason,jdbcType=TINYINT}
+            </if>
+            <if test="orderTimeBegin != null and orderTimeBegin != ''">
+                and  t1.create_time  &gt;= #{orderTimeBegin,jdbcType=VARCHAR}   /*创建时间 这里当作下单时间*/
+            </if>
+            <if test="orderTimeEnd != null and orderTimeEnd != ''" >
+                and  t1.create_time  &lt;= #{orderTimeBegin,jdbcType=VARCHAR}
+            </if>
+            <if test="refundTimeBegin != null and refundTimeBegin != ''">
+                and t1.refund_time &gt;= #{refundTimeBegin,jdbcType=VARCHAR}
+            </if>
+            <if test="refundTimeEnd != null and refundTimeEnd != ''">
+                and t1.refund_time &lt;= #{refundTimeBegin,jdbcType=VARCHAR}
+            </if>
+
+        </where>
+        limit #{offset} ,#{size}
+    </select>
+    <select id = "refundOrderPageCountOnAdmin" resultType="integer">
+        SELECT
+        count(*)
+        FROM t_refund_order t1
+        LEFT JOIN t_user t2 ON t1.user_id = t2.id
+        <where>
+            AND t1.status = #{status,jdbcType=TINYINT}
+            <if test="search != null and search != ''" >
+                and (
+                t1.order_id like "%"#{search,jdbcType=VARCHAR}"%" /*订单编号*/
+                OR t2.mobile like "%"#{search,jdbcType=VARCHAR}"%" /*注册手机号*/
+                OR t2.contact_phone like "%"#{search,jdbcType=VARCHAR}"%"  /*联系人手机*/
+                OR t2.help_Code like "%"#{search,jdbcType=VARCHAR}"%" /*客户编号*/
+                )
+            </if>
+            <if test="settleStatus != null">
+                and t1.settle_status = #{settleStatus,jdbcType=TINYINT}
+            </if>
+            <if test="refundReason != null">
+                and t1.reason = #{refundReason,jdbcType=TINYINT}
+            </if>
+            <if test="orderTimeBegin != null and orderTimeBegin != ''">
+                and  t1.create_time  &gt;= #{orderTimeBegin,jdbcType=VARCHAR}   /*创建时间 这里当作下单时间*/
+            </if>
+            <if test="orderTimeEnd != null and orderTimeEnd != ''" >
+                and t1.create_time  &lt;= #{orderTimeBegin,jdbcType=VARCHAR}
+            </if>
+            <if test="refundTimeBegin != null and refundTimeBegin != ''">
+                and t1.refund_time &gt;= #{refundTimeBegin,jdbcType=VARCHAR}
+            </if>
+            <if test="refundTimeEnd != null and refundTimeEnd != ''">
+                and t1.refund_time &lt;= #{refundTimeBegin,jdbcType=VARCHAR}
+            </if>
+
+        </where>
+    </select>
+    <select id = "statistical" resultType = "java.util.HashMap">
+        SELECT
+        IFNULL(SUM(CASE WHEN t1.status = 2 OR t1.status = 1 THEN 1 ELSE 0 END),0) AS tab1, /* 申请退款*/
+        IFNUll(SUM(CASE WHEN t1.status = 3 THEN 1 ELSE 0 END),0) AS tab2,  /*待客户确认*/
+        IFNUll(SUM(CASE WHEN t1.status = 4 THEN 1 ELSE 0 END),0) AS tab3,  /*待审核*/
+        IFNUll(SUM(CASE WHEN t1.status = 5 THEN 1 ELSE 0 END),0) AS tab4,  /*退款中*/
+        IFNUll(SUM(CASE WHEN t1.status = 6 THEN 1 ELSE 0 END),0) AS tab5,  /*已退款*/
+        IFNUll(SUM(CASE WHEN t1.status = 7 THEN 1 ELSE 0 END),0) AS tab6,  /*退款失败*/
+        IFNUll(SUM(CASE WHEN t1.status = 8 THEN 1 ELSE 0 END),0) AS tab7   /*客户拒绝*/
+        FROM
+        t_refund_order  t1
+        LEFT JOIN t_user t2 ON t1.user_id = t2.id
+        <where>
+            <if test="search != null and search != ''" >
+                and (
+                t1.order_id like "%"#{search,jdbcType=VARCHAR}"%"  /*订单编号*/
+                OR t2.mobile like "%"#{search,jdbcType=VARCHAR}"%"  /*注册手机号*/
+                OR t2.contact_phone like "%"#{search,jdbcType=VARCHAR}"%"   /*联系人手机*/
+                OR t2.help_Code like "%"#{search,jdbcType=VARCHAR}"%"  /*客户编号*/
+                )
+            </if>
+            <if test="settleStatus != null">
+                and t1.settle_status = #{settleStatus,jdbcType=TINYINT}
+            </if>
+            <if test="refundReason != null">
+                and t1.reason = #{refundReason,jdbcType=TINYINT}
+            </if>
+            <if test="orderTimeBegin != null and orderTimeBegin != ''">
+                and  t1.create_time  &gt;= #{orderTimeBegin,jdbcType=VARCHAR}    /*创建时间 这里当作下单时间 */
+            </if>
+            <if test="orderTimeEnd != null and orderTimeEnd != ''" >
+                and t1.create_time  &lt;= #{orderTimeBegin,jdbcType=VARCHAR}
+            </if>
+            <if test="refundTimeBegin != null and refundTimeBegin != ''">
+                and t1.refund_time &gt;= #{refundTimeBegin,jdbcType=VARCHAR}
+            </if>
+            <if test="refundTimeEnd != null and refundTimeEnd != ''">
+                and t1.refund_time &lt;= #{refundTimeBegin,jdbcType=VARCHAR}
+            </if>
+
+        </where>
+    </select>
+</mapper>

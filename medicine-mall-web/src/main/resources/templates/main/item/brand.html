@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="common/header::common_head"/>
+    <link rel="stylesheet" th:href="${staticUrl} + '/main/css/item/brand.css'">
+</head>
+<body>
+<div id="brand" v-cloak>
+<!--        <Tabs type="card">-->
+<!--            <Tab-pane label="品牌列表">-->
+                <div class="btn-action-group">
+                    <i-input search="true" suffix="ios-search" @on-search="search" v-model="searchValue" placeholder="请输入品牌名称..." style="width: 300px"></i-input>
+                    <i-button type="info" @click="addBrand_modal=true,isAddSub=false">新增品牌</i-button>
+                </div>
+                <i-table class="brandList" :height="tableHeight" stripe :loading="loading" :columns="tableHead" :data="tableData"></i-table>
+                <Page class="brandPage" :total="page.total" :current="page.current" :page-size="page.size" @on-page-size-change="pageSizeChange" show-total @on-change="changePage" :page-size-opts="pageSizeOpts" show-sizer show-elevator></Page>
+<!--            </Tab-pane>-->
+<!--            <Tab-pane label="品牌树">-->
+<!--                <div class="brandTree">-->
+<!--                    <Tree :data="treeData" :load-data="loadData" :render="renderContent"></Tree>-->
+<!--                </div>-->
+<!--            </Tab-pane>-->
+<!--        </Tabs>-->
+
+        <Modal v-model="addBrand_modal"
+               title="新增品牌"
+               :closable="true"
+               :mask-closable="false">
+            <div v-if="isAddSub">父品牌名称：{{selectItem.ibrandName}}</div>
+                <i-input v-model="newBrand.ibrandName" placeholder="品牌名称（必填）" @on-change=""></i-input>
+                <i-input number="true" type="number" v-model="newBrand.sort" placeholder="排序号码（必填）" @on-change=""></i-input>
+                <i-input v-model="newBrand.brandImg" placeholder="图片地址" @on-change=""></i-input>
+            <Upload :before-upload="uploadFile" action="">
+                <i-button type="text" @click="clickUpLoad('add')" icon="ios-cloud-upload-outline">上传图片</i-button>
+            </Upload>
+            <img :src="newBrand.brandImg"  style="max-width: 450px;"   @on-change="" />
+            <div slot="footer">
+                <i-button type="text" @click="addBrand_modal=false">取消</i-button>
+                <i-button type="primary" @click="addBrandSubmit">确定</i-button>
+            </div>
+        </Modal>
+        <Modal v-model="editBrand_modal"
+               title="编辑品牌"
+               :closable="true"
+               :mask-closable="false">
+                <i-input v-model="selectItem.ibrandName" placeholder="品牌名称（必填）" @on-change=""></i-input>
+                <i-input number="true" type="number" v-model="selectItem.sort" placeholder="排序号码（必填）" @on-change=""></i-input>
+                <i-input  v-model="selectItem.brandImg" placeholder="图片地址" @on-change=""></i-input>
+                <img :src="selectItem.brandImg"  style="max-width: 450px;"  @on-change="" />
+            <Upload :before-upload="uploadFile" action="">
+                <i-button type="text" @click="clickUpLoad('edit')" icon="ios-cloud-upload-outline">上传图片</i-button>
+            </Upload>
+            <div slot="footer">
+                <i-button type="text" @click="editBrand_modal=false">取消</i-button>
+                <i-button type="primary" @click="editBrandSubmit">确定</i-button>
+            </div>
+        </Modal>
+<!--        <Modal v-model="brandTree_modal"-->
+<!--               title="品牌详情"-->
+<!--               closable="false"-->
+<!--               mask-closable="false">-->
+<!--            <div>-->
+<!--                <div v-if="brandDetail.parentName">父品牌名称：{{brandDetail.parentName}}</div>-->
+<!--                <div v-if="brandDetail.parentId">父品牌id：{{brandDetail.parentId}}</div>-->
+<!--                <div v-if="brandDetail.ibrandName">品牌名称：{{brandDetail.ibrandName}}</div>-->
+<!--                <div v-if="brandDetail.id">品牌id：{{brandDetail.id}}</div>-->
+<!--                <div>品牌图片：<img v-if="brandDetail.brandImg" src="" alt=""/></div>-->
+<!--                <div class="subItem">-->
+<!--                    子品牌：-->
+<!--                    <div v-for="item in brandDetail.subItem">-->
+<!--                        {{item.ibrandName}}-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div slot="footer">-->
+<!--                <i-button type="text" @click="addBrand_modal=false">关闭</i-button>-->
+<!--            </div>-->
+<!--        </Modal>-->
+</div>
+<div th:replace="common/script::footer_script"></div>
+<script type="text/babel" th:src="${staticUrl}+'/main/js/item/brand.js'"></script>
+<script type="text/babel" th:src="${staticUrl} + '/common/axios/upload.js?version=' + ${version}"></script>
+</body>
+</html>

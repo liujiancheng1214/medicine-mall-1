@@ -1,0 +1,75 @@
+#btn-action-group{
+    padding: 14px 0px 0px 20px;
+}
+
+[v-cloak] {
+    display: none;
+}
+.ivu-table .ivu-table-header .ivu-table-cell {
+    font-size: 13px;
+    font-weight: bold;
+}
+.mouse-on:hover{
+    text-decoration: underline;
+}
+
+/**
+证件图片
+ */
+.imgTitle{
+    font-size: 20px;
+    font-weight: bold;
+    padding: 10px 0;
+}
+#viewer{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+#viewer > li > img {
+    width: 220px;
+    height: 270px;
+    cursor: zoom-in;
+}
+img {
+    border-radius: 6px;
+    display: inline-block;
+    max-width: 100%;
+    height: auto;
+    padding: 4px;
+    line-height: 1.42857143;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    -webkit-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+#viewer > li {
+    float: left;
+    width: 250px;
+    height: 340px;
+    margin: 0 -1px -1px 0;
+    border: 1px solid transparent;
+    overflow: hidden;
+}
+li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+ul {
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+}
+.pic_name {
+    text-align: center;
+    width: 220px;
+    margin-top: 20px;
+    margin-bottom: 12px;
+    font-size: 14px;
+}

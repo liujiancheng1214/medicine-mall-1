@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="common/header::common_head"/>
+    <link th:href="${staticUrl} + '/common/element-ui/theme-chalk/index.css?version=' + ${version}" rel="stylesheet"
+          type="text/css">
+    <script th:src="${staticUrl} + '/common/element-ui/index.js?version=' + ${version}"></script>
+    <style>
+        #btn-action-group {
+            padding: 20px 20px 0px 20px;
+        }
+        [v-cloak] {
+            display: none;
+        }
+        .ivu-table .ivu-table-header .ivu-table-cell {
+            font-size: 13px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <div id="btn-action-group">
+        <Row type="flex" align="middle" style="margin-bottom: 20px">
+            <i-col span="7">
+                <i-input search placeholder="权限名称/权限值" v-model="searchValue" @on-search="loadData"/>
+            </i-col>
+            <i-col span="2" offset="15">
+                <i-button type="primary" style="float: right;margin-top: 5px" @click="addPerm" shape="circle">
+                    新增权限
+                </i-button>
+            </i-col>
+        </Row>
+    </div>
+    <i-table :height="tableHeight" border :loading="loading" :columns="tableHead" :data="tableData"></i-table>
+    <div style="margin: 10px;overflow: hidden">
+        <div style="float: right;">
+            <Page show-sizer :total="total" :current="page.current" :page-size="page.size" show-total="true"
+                  @on-page-size-change="pageSizeChange" :page-size-opts="pageSizeOpts"
+                  @on-change="changePage"></Page>
+        </div>
+    </div>
+    <Modal v-model="showEdit" title="新增权限" @on-ok="savePerm" @on-cancel="clear()" :mask-closable="false">
+        <table width="100%">
+            <tr height="50px">
+                <td align="right" width="20%">权限名称:　</td>
+                <td>
+                    <i-input v-model="newPerm.name" size="large" placeholder="权限名称" clearable maxlength="50"/>
+                </td>
+            </tr>
+            <tr height="50px">
+                <td align="right" width="20%">权限值:　</td>
+                <td>
+                    <i-input v-model="newPerm.value" size="large" placeholder="权限值" clearable maxlength="50"/>
+                </td>
+            </tr>
+            <tr height="50px">
+                <td align="right">父权限:　</td>
+                <td>
+                    <el-cascader
+                            style="width: 100%"
+                            :options="data"
+                            :props="{ checkStrictly: true,emitPath: false ,label:'title'}"
+                            v-model="selectedValue"
+                            :show-all-levels="false"
+                            @change="changeSelected"
+                            filterable></el-cascader>
+                </td>
+            </tr>
+        </table>
+    </Modal>
+</div>
+<div th:replace="common/script::footer_script"></div>
+<script type="text/babel" th:src="${staticUrl}+'/main/js/sys/permission.js'"></script>
+</body>
+</html>

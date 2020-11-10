@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>选人页面</title>
+    <th:block th:include="common/header::common_head" />
+</head>
+<body>
+<div id="moduleTreeVue" v-cloak>
+    <div style="float:left;width:40%;border:1px solid rgba(217,217,217,.5);min-height: 348px;margin: 1px;">
+        <Tree :data="data" :load-data="loadData"  ref="tree" @on-select-change="getSelectedNodes()"></Tree>
+    </div>
+    <div style="float:left;width:58%;border:1px solid rgba(217,217,217,.5);min-height: 348px;margin: 1px;">
+        <!--<div style="border-bottom: 1px solid #e9e9e9;padding-bottom:6px;margin-bottom:6px;">
+            <Checkbox
+                    :indeterminate="indeterminate"
+                    :value="checkAll"
+                    @click.prevent.native="handleCheckAll">全选</Checkbox>
+        </div>-->
+        <checkbox-group v-model="userList" @on-change="checkAllGroupChange">
+            <checkbox v-for="(user, index) in userData" :label="JSON.stringify(user)" :key="JSON.stringify(user)" :title="'编号'+user.userNo">
+                <span>{{user.userName}}</span>
+            </checkbox>
+        </checkbox-group>
+    </div>
+    <!--&lt;!&ndash; 操作按钮 &ndash;&gt;
+    <div class="is-actionLine">
+        <i-button type="primary" v-text="'保存'" @click="add()"></i-button>
+    </div>-->
+</div>
+<div th:replace="common/script::footer_script"></div>
+<script type="text/babel" th:src="${staticUrl}+'/base/userTree/js/userList.js?version=' + ${version}"></script>
+</body>
+</html>

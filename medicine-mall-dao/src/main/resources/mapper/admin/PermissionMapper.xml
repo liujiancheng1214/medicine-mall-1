@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jdcloud.medicine.mall.dao.admin.PermissionMapper" >
+
+  <resultMap id="BaseResultMap" type="cn.jdcloud.medicine.mall.domain.admin.Permission" >
+      <id column="id" property="id"  />
+      <result column="parent_id" property="parentId"  />
+      <result column="name" property="name"  />
+      <result column="value" property="value"  />
+      <result column="create_time" property="createTime"/>
+      <result column="update_time" property="updateTime"/>
+  </resultMap>
+
+    <sql id="Base_Column_List" >
+    id, parent_id, name, value, create_time,update_time
+  </sql>
+
+    <select id="listAll" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from s_permission t where t.type  in (1,2,3)
+    </select>
+
+
+    <select id="listPermMap" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from s_permission
+    </select>
+
+    <select id="listPermsByRoles" resultMap="BaseResultMap">
+        select
+        t2.id,
+        t2.value,
+        t2.name,
+        t2.parent_id
+        from s_role_permission t1
+        inner  join  s_permission t2
+        on t1.permission_id  = t2.id
+        where t1.role_id  in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            ${item}
+        </foreach>
+    </select>
+
+
+</mapper>

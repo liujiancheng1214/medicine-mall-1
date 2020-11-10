@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="common_head">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <link rel="shortcut icon" th:href="${staticUrl} +'/logo/'+${platform.logo} + '.ico'" type="image/x-icon">
+    <link th:href="${staticUrl} + '/common/iview/iview.css?dt=1&version=' + ${version}" rel="stylesheet" type="text/css">
+    <link th:href="${staticUrl} + '/common/iview/reset.css?version=' + ${version}" rel="stylesheet" type="text/css">
+    <link th:href="${staticUrl} + '/common/iview/common.css?version=' + ${version}" rel="stylesheet" type="text/css">
+    <link th:href="${staticUrl} + '/common/iview/modulesTab.css?version=' + ${version}" rel="stylesheet" type="text/css">
+    <link th:href="${staticUrl} + '/common/iview/form.css?version=' + ${version}" rel="stylesheet" type="text/css">
+    <!--<link th:href="${staticUrl} + '/common/element-ui/theme-chalk/index.css?version=' + ${version}" rel="stylesheet" type="text/css">-->
+    <!--ie兼容es6语法-->
+    <script th:src="${staticUrl} + '/common/babel/browser.min.js?version=' + ${version}"></script>
+    <script th:src="${staticUrl} + '/common/babel/polyfill.min.js?version=' + ${version}"></script>
+
+    <script th:src="${staticUrl} + '/common/vue/vue.min.js?version=' + ${version}"></script>
+<!--    未压缩 调试-->
+<!--    <script th:src="${staticUrl} + '/common/vue/vue.js?version=' + ${version}"></script>-->
+    <script th:src="${staticUrl} + '/common/iview/iview.min.js?version=' + ${version}"></script>
+    <script th:src="${staticUrl} + '/common/utils/tools.js?version=' + ${version}"></script>
+
+    <!--<script th:src="${staticUrl} + '/common/element-ui/index.js?version=' + ${version}"></script>-->
+</head>
+</html>
+

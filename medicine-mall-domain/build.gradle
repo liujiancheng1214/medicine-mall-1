@@ -1,0 +1,9 @@
+configurations {
+	provided
+}
+dependencies {
+	compile ("cn.jdcloud.framework:jdcloud-core:${jdcloudFrameworkVersion}")
+	compile ("cn.jdcloud.framework:jdcloud-common:${jdcloudFrameworkVersion}")
+	compile ("org.projectlombok:lombok:${lombokVersion}")
+	compile ("com.baomidou:mybatis-plus-boot-starter:3.3.2")
+}

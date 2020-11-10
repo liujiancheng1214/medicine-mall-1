@@ -1,0 +1,295 @@
+body {
+    min-width: 720px;
+    min-height: 600px;
+    background-image: url(../../logo/login-bg01.jpg);
+    -moz-background-size:100% 100%; background-size:100% 100%;
+}
+.wrapper {
+    min-width: 720px;
+    min-height: 600px;
+    margin: 0 auto;
+    height: 100%;
+}
+.wrapper .login-header {
+    height: 30px;
+    line-height: 30px;
+    position: fixed;
+    top: 20px;
+    right: 2%;
+    overflow: hidden;
+}
+.wrapper .login-header ul {
+    overflow: hidden;
+}
+.wrapper .login-header ul li {
+    margin-left: 20px;
+    float: left;
+}
+.wrapper .login-header ul li > a {
+    width: 100%;
+    height: 100%;
+    display: block;
+    color: #34495e;
+    font-size: 15px;
+    overflow: hidden;
+}
+.wrapper .login-header ul li > a > img {
+    margin-right: 5px;
+    vertical-align: top;
+    float: left;
+}
+.wrapper .login-header ul li > a > span {
+    float: left;
+}
+.wrapper .login-header ul li > a.colorRed {
+    color: red;
+}
+.wrapper .login-header ul li:first-child {
+    margin-left: 0;
+}
+.wrapper .login-main {
+    width: 400px;
+    position: fixed;
+    top: 40%;
+    left: 10px;
+    right: 10px;
+    margin: -140px auto auto auto;
+}
+.wrapper .login-main .logo img {
+    display: block;
+    margin: auto;
+}
+.wrapper .login-pad {
+    padding: 20px 30px 30px;
+    background: white;
+}
+.wrapper .login-pad .sys-name {
+    margin: 3% 0 0 25%;
+    font-weight: 900;
+    font-size: x-large;
+}
+.wrapper .login-pad .login-row-1 {
+    margin-top: 5%;
+}
+.wrapper .login-pad .login-row {
+    margin-top: 30px;
+}
+.wrapper .login-pad .login-button {
+    width: 100%;
+}
+/*.wrapper .login-main .login-box {*/
+/*    height: 40px;*/
+/*    margin-top: 50px;*/
+/*    overflow: hidden;*/
+/*}*/
+/*.wrapper .login-main .login-box .input-box {*/
+/*    height: 40px;*/
+/*    width: 297px;*/
+/*    line-height: 39px;*/
+/*    box-sizing: border-box;*/
+/*    border: 1px solid #ccc;*/
+/*    margin-right: 5px;*/
+/*    float: left;*/
+/*}*/
+/*.wrapper .login-main .login-box .input-box > i {*/
+/*    width: 35px;*/
+/*    height: 39px;*/
+/*    display: block;*/
+/*    float: left;*/
+/*}*/
+/*.wrapper .login-main .login-box .input-box > i.user {*/
+/*    background: url(../images/login-user.png) center no-repeat;*/
+/*}*/
+/*.wrapper .login-main .login-box .input-box > i.password {*/
+/*    background: url(../images/login-password.png) center no-repeat;*/
+/*}*/
+/*.wrapper .login-main .login-box .input-box > input {*/
+/*    float: right;*/
+/*    width: 260px;*/
+/*    height: 100%;*/
+/*    line-height: 39px;*/
+/*    border: none;*/
+/*    vertical-align: top;*/
+/*    color: #888;*/
+/*    font-size: 14px;*/
+/*}*/
+/*.wrapper .login-main .login-box .submit {*/
+/*    color: white;*/
+/*    width: 95px;*/
+/*    height: 40px;*/
+/*    line-height: 40px;*/
+/*    text-align: center;*/
+/*    font-size: 16px;*/
+/*    float: right;*/
+/*    cursor: pointer;*/
+/*    background-color: #3499da;*/
+/*    background: -webkit-linear-gradient(45deg, #2e8bff, #40b5ff);*/
+/*    background: -o-linear-gradient(45deg, #2e8bff, #40b5ff);*/
+/*    background: -moz-linear-gradient(45deg, #2e8bff, #40b5ff);*/
+/*    background: -ms-linear-gradient(45deg, #2e8bff, #40b5ff);*/
+/*    background: linear-gradient(45deg, #2e8bff, #40b5ff);*/
+/*}*/
+.wrapper .QRcode {
+    width: 160px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 12px;
+    margin: auto;
+    top: 50%;
+}
+.wrapper .QRcode > .imgBox {
+    width: 160px;
+    height: 150px;
+    position: relative;
+}
+.wrapper .QRcode > .imgBox > img {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+}
+.wrapper .login-footer {
+    width: 100%;
+    height: 58px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    /*background-color: #eff2f5;*/
+    /*border-top: 2px solid #edf0f4;*/
+    box-sizing: border-box;
+    text-align: center;
+    line-height: 56px;
+    font-size: 14px;
+}
+.wrapper .login-footer a {
+    text-decoration: underline;
+}
+/*弹层*/
+.ivu-modal-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ivu-modal-wrap .ivu-modal {
+    top: 0;
+}
+/*选择账号start*/
+#Account {
+    display: none;
+}
+#AccountModal .vertical-center-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#AccountModal .vertical-center-modal .ivu-modal {
+    top: 0;
+}
+#AccountModal .ivu-modal-footer {
+    display: none;
+}
+#AccountModal .ivu-alert {
+    padding: 8px 16px 8px 16px;
+}
+#AccountModal .ivu-modal {
+    width: auto!important;
+    max-width: 630px;
+}
+#AccountModal .accounts {
+    overflow: hidden;
+    width: 605px;
+    max-height: 388px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    margin: 0 auto 0;
+    text-align: center;
+    font-size: 0;
+    padding: 10px;
+}
+#AccountModal .accounts .box {
+    width: 90px;
+    box-sizing: content-box;
+    display: block;
+    display: inline-block;
+    font-size: 14px;
+    color: #333;
+    margin: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    padding: 10px 15px;
+    border: 1px solid #dcdee2;
+}
+#AccountModal .accounts .box .img {
+    width: 90px;
+    height: 120px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+#AccountModal .accounts .box .img > img {
+    width: 100%;
+    height: 100%;
+}
+#AccountModal .accounts .box:hover {
+    box-shadow: 0 0 10px #98c7f3;
+}
+/*end*/
+
+/*选择账号*/
+.user-list {
+    overflow: auto;
+}
+.user-list .user-box {
+    padding: 10px;
+    box-sizing: border-box;
+    border-bottom: 1PX solid #eeeeee;
+}
+.user-list .user-box > a {
+    overflow: hidden;
+    display: block;
+    /*background: url(../../assets/home/images/jiantou_06.png) right center no-repeat / 0.186667rem 0.293333rem;*/
+}
+.user-list .user-box .portrait {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    float: left;
+}
+.user-list .user-box .portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.user-list .user-box .user-info {
+    margin-left: 60px;
+    height: 50px;
+    color: #666666;
+    font-size: 14px;
+    text-align: left;
+}
+.user-list .user-box .user-info > div {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: 0;
+}
+.user-list .user-box .user-info > div .userName {
+    color: #333333;
+    font-size: 14px;
+    margin-right: 5px;
+    display: inline-block;
+    font-weight: bold;
+}
+.user-list .user-box .user-info > div .userId {
+    font-size: 14px;
+    display: inline-block;
+}
+.user-list .user-box .user-info .schoolName {
+    font-size: 14px;
+    margin-top: 5px;
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jdcloud.medicine.mall.dao.admin.RolePermMapper" >
+  <resultMap id="BaseResultMap" type="cn.jdcloud.medicine.mall.domain.admin.RolePermission" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="permission_id" property="permissionId" jdbcType="INTEGER" />
+    <result column="role_id" property="roleId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, permission_id, role_id, create_time
+  </sql>
+
+  <insert id="insertBatch">
+    insert into s_role_permission
+    (
+    permission_id,
+    role_id
+    )values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.permissionId},${item.roleId})
+    </foreach>
+  </insert>
+
+  <delete id="deleteRolePerm">
+    delete from  s_role_permission
+    where role_id = ${roleId}
+  </delete>
+
+</mapper>

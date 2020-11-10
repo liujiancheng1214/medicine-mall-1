@@ -1,0 +1,68 @@
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.5'
+}
+//所有子项目引用
+subprojects {
+    apply plugin: "java"
+    apply plugin: 'maven'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+
+    group = 'cn.jdcloud'
+    version = '1.0.0-SNAPSHOT'
+
+    // JVM 版本号要求
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    // java编译的时候缺省状态下会因为中文字符而失败
+    [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+    compileJava {
+        options.fork = true
+        options.forkOptions.executable = 'javac'
+        options.compilerArgs << "-XDignore.symbol.file"
+    }
+
+    ext {
+        springBootVersion = '2.0.4.RELEASE'
+        springBootMyBatisVersion = '1.3.2'
+        springBootpagehelperVersion = '1.1.0'
+        springBootDruidVersion = '1.1.9'
+        mysqlVersion = "5.1.9"
+        jdcloudFrameworkVersion = "1.0.0"
+
+//		junitVersion                = "4.12"
+
+//		jacksonVersion              = "2.8.7"
+        httpclientVersion = "4.3.5"
+        servletapiVersion = "3.1.0"
+        commonslangVersion = "2.6"
+        commonslang3Version = "3.3.2"
+        commonsioVersion = "1.3.2"
+        commonsnetVersion = "3.3"
+        jsqlparserVersion = "4.12"
+        slf4jVersion = "1.7.2"
+        log4jVersion = "1.2.17"
+        commonsfileuploadVersion = "1.3.1"
+        swagger2Version = "2.8.0"
+        lombokVersion = "1.16.22"
+        jedisVersion = "2.7.2"
+        gsonVersion = "2.8.5"
+        pingyin4jVersion = "2.5.0"
+    }
+
+    repositories {
+        maven{ url 'http://nexus.jdcloud.cn/repository/maven-public/'}
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "http://nexus.jdcloud.cn/repository/maven-snapshots/") {
+                    authentication(userName: "deploy", password: "deploy123")
+                }
+            }
+        }
+    }
+}

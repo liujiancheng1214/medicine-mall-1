@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${platform.name}">IS智慧平台云联盟</title>
+    <th:block th:include="common/header::common_head"/>
+    <link rel="stylesheet" th:href="${staticUrl} + '/main/css/index.css'">
+</head>
+<body>
+<div id="app">
+    <Modal v-model="changePwd_modal" title="修改密码" @on-ok="changePwdSubmit" @on-cancel="">
+        <i-input type="password" v-model="password.old" @on-blur="checkPwd" placeholder="请输入旧密码"></i-input>
+        <i-input style="margin-top: 20px;" type="password" v-model="password.p1" @on-blur="checkPwd"
+                 placeholder="请输入新密码"></i-input>
+        <i-input style="margin-top: 20px;" type="password" v-model="password.p2" @on-blur="checkPwd"
+                 placeholder="请输再次入新密码"></i-input>
+    </Modal>
+    <div class="main ivu-layout ivu-layout-has-sider" style="height: 100%;">
+        <div class="left-sider ivu-layout-sider"
+             style="width: 200px; min-width: 200px; max-width: 200px; flex: 0 0 256px; overflow: hidden;"><span
+                class="ivu-layout-sider-zero-width-trigger" style="display: none;"><i
+                class="ivu-icon ivu-icon-ios-menu"></i></span>
+            <div class="ivu-layout-sider-children">
+                <div class="side-menu-wrapper">
+                    <div class="logo-con">
+                        <img src="">
+                    </div>
+                    <ul class="ivu-menu ivu-menu-dark ivu-menu-vertical" style="width: auto;font-size: 16px">
+                        <template v-for="menu in menuList">
+                            <li v-if="menu.children" @click.stop="menuClick(menu)" class="ivu-menu-submenu">
+                                <div class="ivu-menu-submenu-title">
+                                    <i :class="'ivu-icon ivu-icon-'+menu.icon"></i><span>{{menu.title}}</span>
+                                    <i class="ivu-icon ivu-icon-ios-arrow-down ivu-menu-submenu-title-icon"></i>
+                                </div>
+                                <ul class="ivu-menu" v-show="menu.showChildren">
+                                    <li v-for="child in menu.children" @click.stop="menuClick(child)"
+                                        class="ivu-menu-item" style="padding-left: 43px;">
+                                        <i :class="'ivu-icon ivu-icon-'+child.icon"></i>
+                                        <span>{{child.title}}</span>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li v-else class="ivu-menu-item" @click.stop="menuClick(menu)">
+                                <i :class="'ivu-icon ivu-icon-'+ menu.icon"></i><span>{{menu.title}}</span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="ivu-layout">
+            <div class="header-con ivu-layout-header" style="min-width: 700px">
+                <div class="header-bar"><a type="text" class="sider-trigger-a"><i class="ivu-icon ivu-icon-md-menu"
+                                                                                  style="font-size: 26px;"></i></a>
+                    <div class="custom-bread-crumb" style="margin-left: 30px;">
+                        <div class="ivu-breadcrumb" style="font-size: 14px;">
+                            <span>
+                                <span class="ivu-breadcrumb-item-link" @click.stop="goToHome()" style="cursor: pointer">
+                                    <i class="ivu-icon ivu-icon-md-home" style="margin-right: 4px;"></i>首页
+                                </span>
+                                <span class="ivu-breadcrumb-item-separator">/</span>
+                            </span>
+                            <span v-for="menu in currentMenuPath">
+                                <span class="ivu-breadcrumb-item-link">
+                                    <i :class="'ivu-icon ivu-icon-'+menu.icon" style="margin-right: 4px;"></i>{{menu.title}}
+                                </span>
+                                <span class="ivu-breadcrumb-item-separator">/</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="custom-content-con">
+                        <div class="user-avatar-dropdown">
+                            <Dropdown @on-click="operateUser" trigger="hover" style="margin-left: 20px">
+                                <a href="javascript:void(0)">
+                                    <span class="ivu-badge">
+                                        <span class="ivu-avatar ivu-avatar-circle ivu-avatar-default ivu-avatar-image">
+                                            <img :src="headImg">
+                                        </span>
+                                    </span>
+                                    <!--                                    <i class="ivu-icon ivu-icon-md-arrow-dropdown" style="font-size: 18px;"></i>-->
+                                </a>
+                                <Dropdown-menu slot="list">
+                                    <Dropdown-item name="changePwd">修改密码</Dropdown-item>
+                                    <Dropdown-item name="loginOut">退出登录</Dropdown-item>
+                                </Dropdown-menu>
+                            </Dropdown>
+                        </div>
+                        <!--<div style="margin-right: 10px;">-->
+                        <!--<div class="ivu-dropdown">-->
+                        <!--<div class="ivu-dropdown-rel"><a href="javascript:void(0)">-->
+                        <!--语言-->
+                        <!--<i class="ivu-icon ivu-icon-md-arrow-dropdown" style="font-size: 18px;"></i></a>-->
+                        <!--</div>-->
+                        <!--<div class="ivu-select-dropdown" style="display: none;">-->
+                        <!--<ul class="ivu-dropdown-menu">-->
+                        <!--<li class="ivu-dropdown-item">中文简体</li>-->
+                        <!--<li class="ivu-dropdown-item">中文繁体</li>-->
+                        <!--<li class="ivu-dropdown-item">English</li>-->
+                        <!--</ul>-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="error-store"><span class="ivu-badge"><button type="button"-->
+                        <!--class="ivu-btn ivu-btn-text">&lt;!&ndash;&ndash;&gt;-->
+                        <!--&lt;!&ndash;&ndash;&gt; <span><i class="ivu-icon ivu-icon-ios-bug"-->
+                        <!--style="font-size: 20px;"></i></span></button> <sup class="ivu-badge-dot"-->
+                        <!--style="display: none;"></sup></span>-->
+                        <!--</div>-->
+                        <!--<div class="full-screen-btn-con" style="margin-right: 10px;">-->
+                        <!--<div class="ivu-tooltip">-->
+                        <!--<div class="ivu-tooltip-rel"><i class="ivu-icon ivu-icon-md-expand"-->
+                        <!--style="font-size: 23px;"></i></div>-->
+                        <!--<div class="ivu-tooltip-popper ivu-tooltip-dark" style="display: none;">-->
+                        <!--<div class="ivu-tooltip-content">-->
+                        <!--<div class="ivu-tooltip-arrow"></div>-->
+                        <!--<div class="ivu-tooltip-inner">全屏</div>-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <!--</div>-->
+                    </div>
+                </div>
+            </div>
+            <div class="main-content-con ivu-layout-content">
+                <div class="main-layout-con ivu-layout">
+                    <div class="tag-nav-wrapper">
+                        <div class="tags-nav">
+                            <div class="close-con">
+                                <div class="ivu-dropdown" style="margin-top: 7px;">
+                                    <div class="ivu-dropdown-rel">
+                                        <button type="button" class="ivu-btn ivu-btn-text ivu-btn-small"
+                                                @click="breadMenuListRemoveAll()"><!----> <!---->
+                                            <span><i class="ivu-icon ivu-icon-ios-close-circle-outline"
+                                                     style="font-size: 18px;"></i></span></button>
+                                    </div> <!----></div>
+                            </div>
+                            <div class="btn-con left-btn">
+                                <button type="button" @click="scroll(true)" class="ivu-btn ivu-btn-text left-button">
+                                    <span>
+                                        <i class="ivu-icon ivu-icon-ios-arrow-back" style="font-size: 18px;"></i>
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="btn-con right-btn">
+                                <button type="button" @click="scroll(false)" class="ivu-btn ivu-btn-text right-button">
+                                    <span>
+                                        <i class="ivu-icon ivu-icon-ios-arrow-forward" style="font-size: 18px;"></i>
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="scroll-outer">
+                                <div class="scroll-body" style="left: 0px;"><span>
+                                    <div class="ivu-tag ivu-tag-dot ivu-tag-checked" @click="goToHome"
+                                         :class="currentMenu.id=='home'?'ivu-tag-primary':'ivu-tag-default'">
+                                        <span class="ivu-tag-dot-inner"></span>
+                                        <span class="ivu-tag-text">首页</span> <!---->
+                                    </div>
+                                    <div v-for="menu in breadMenuList"
+                                         class="ivu-tag ivu-tag-dot ivu-tag-closable ivu-tag-checked"
+                                         :class="currentMenu.id==menu.id ?'ivu-tag-primary':'ivu-tag-default'"
+                                         @click.stop="setCurrentMenu(menu.id)">
+                                        <span class="ivu-tag-dot-inner"></span>
+                                        <span class="ivu-tag-text">{{menu.title}}</span>
+                                        <i class="ivu-icon ivu-icon-ios-close"
+                                           @click.stop="breadMenuListRemove(menu.id)"></i>
+                                    </div>
+                                    <!--<div class="ivu-tag ivu-tag-primary ivu-tag-dot ivu-tag-closable ivu-tag-checked">-->
+                                    <!--<span class="ivu-tag-dot-inner"></span>-->
+                                    <!--<span class="ivu-tag-text">工具函数</span>-->
+                                    <!--<i class="ivu-icon ivu-icon-ios-close"></i>-->
+                                    <!--</div>-->
+                                    <!--<div class="ivu-tag ivu-tag-default ivu-tag-dot ivu-tag-closable ivu-tag-checked">-->
+                                    <!--<span class="ivu-tag-dot-inner"></span>-->
+                                    <!--<span class="ivu-tag-text">错误收集</span>-->
+                                    <!--<i class="ivu-icon ivu-icon-ios-close"></i>-->
+                                    <!--</div>-->
+                                    <!--<div class="ivu-tag ivu-tag-default ivu-tag-dot ivu-tag-closable ivu-tag-checked">-->
+                                    <!--<span class="ivu-tag-dot-inner"></span>-->
+                                    <!--<span class="ivu-tag-text">Level-2-1</span>-->
+                                    <!--<i class="ivu-icon ivu-icon-ios-close"></i>-->
+                                    <!--</div>-->
+                                </span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-wrapper ivu-layout-content">
+                        <iframe :src="currentMenu.path" width="100%" height="100%" style="min-width: 1200px"
+                                frameborder="0"></iframe>
+                        <!--                        <iframe :src="/sys/admin" width="100%" height="100%" frameborder="0">用户设置</iframe>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="common/script::footer_script"></div>
+<script type="text/babel" th:src="${staticUrl}+'/main/js/menu.js'"></script>
+<script type="text/babel" th:src="${staticUrl}+'/main/js/index.js'"></script>
+</body>
+</html>

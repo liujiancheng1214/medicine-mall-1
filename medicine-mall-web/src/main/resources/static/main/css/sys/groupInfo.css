@@ -1,0 +1,11 @@
+#btn-action-group{
+    padding: 14px 20px 0px 20px;
+}
+
+[v-cloak] {
+    display: none;
+}
+.ivu-table .ivu-table-header .ivu-table-cell {
+    font-size: 13px;
+    font-weight: bold;
+}

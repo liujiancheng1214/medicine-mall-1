@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--    <title th:text="${platform.name}">IS智慧平台云联盟</title>-->
+    <th:block th:include="common/header::common_head"/>
+    <link rel="stylesheet" th:href="${staticUrl} + '/main/css/order/list.css'">
+</head>
+<body>
+<div id="order_list" v-cloak>
+    <!--    <template>-->
+    <div id="btn-action-group">
+
+        <i-form inline style="margin-bottom:10px" @submit.native.prevent>
+            <Form-item label="关键字搜索：">
+                <i-input :search="true" placeholder="订单编号/药店名/药店编码/手机号码" v-model="searchValue"
+                         @on-search="search" style="width:300px;margin-right:20px"></i-input>
+            </Form-item>
+            <Form-item label="下单时间：">
+                <date-picker v-model="dateArray" type="datetimerange" :editable="false" :options="dateOption"
+                             placeholder="请选择下单时间" @on-change="selectDate" style="width:300px">
+                </date-picker>
+            </Form-item>
+            <Form-item>
+                <i-button type="primary" style="margin:32px 0 0 20px;" @click="search">搜索</i-button>
+                <i-button v-if="index == 2" type="info" style="margin:32px 0 0 30px;" @click="changeStatus('receive')">接收订单</i-button>
+                <i-button v-if="index == 3" type="info" style="margin:32px 0 0 30px;" @click="changeStatus('starting')">已开户</i-button>
+                <i-button v-if="index == 4" type="info" style="margin:32px 0 0 30px;" @click="changeStatus('started')">开单完成</i-button>
+                <i-button v-if="index == 5" type="info" style="margin:32px 0 0 30px;" @click="changeStatus('ready')">备货完成</i-button>
+                <i-button v-if="index == 6" type="info" style="margin:32px 0 0 30px;" @click="send">物流发货</i-button>
+                <i-button v-if="index == 7" type="info" style="margin:32px 0 0 30px;" @click="changeStatus('delivered')">配送完成</i-button>
+                <i-button v-if="index != 8" type="error" style="margin:32px 0 0 30px;" @click="refund">申请退款</i-button>
+                <i-button v-if="index == 2" type="success" style="margin:32px 0 0 30px;" @click="importExcelModal = true">导入订单</i-button>
+                <i-button v-if="selectList.length == 0" type="warning" style="margin:32px 0 0 30px;" @click="exportOrder(false)">导出全部</i-button>
+                <i-button v-else type="warning" style="margin:32px 0 0 30px;" @click="exportOrder(true)">导出已选</i-button>
+            </Form-item>
+        </i-form>
+    </div>
+
+    <tabs v-model="index" type="card" @on-click="changeTab">
+        <tab-pane :label="label1" name="0"></tab-pane>
+        <tab-pane :label="label2" name="2"></tab-pane>
+        <tab-pane :label="label3" name="3"></tab-pane>
+        <tab-pane :label="label4" name="4"></tab-pane>
+        <tab-pane :label="label5" name="5"></tab-pane>
+        <tab-pane :label="label6" name="6"></tab-pane>
+        <tab-pane :label="label7" name="7"></tab-pane>
+        <tab-pane :label="label8" name="11"></tab-pane>
+        <tab-pane :label="label9" name="8"></tab-pane>
+    </tabs>
+
+    <i-table :loading="loading" stripe border :columns="tableHead" :data="orderList" ref="table" :height="tableHeight"
+             @on-selection-change="getSelection"></i-table>
+
+    <div style="margin: 10px;overflow: hidden;float: right">
+        <Page @on-change="pageChange" :total="page.total" show-total :current="page.current"
+              transfer="true" show-sizer @on-page-size-change="pageSizeChange"></Page>
+    </div>
+
+    <Modal v-model="importExcelModal" title="导入数据" @on-ok="importExcelSubmit"
+           @on-cancel="importExcel_modal=false,cleanSelect()">
+        <div>请选择Excel文件： <input type="file" ref='file'>
+            <p style="color: #2b85e4;cursor: pointer;" @click="importTemplate">下载模板</p>
+        </div>
+    </Modal>
+
+    <Modal v-model="show" width="1200" :footer-hide="true">
+        <div slot="header" style="text-align: center">订 单 编 号 ： {{selectOrder.orderId}}&emsp;&emsp;订单详情</div>
+        <i-table :loading="load" stripe border :columns="infoHead" :data="infoList" :height="tableHeight"></i-table>
+    </Modal>
+
+    <Modal class="wuliu" v-model="wuliuModal" :mask-closable="false" @on-cancel="sendLogistic(false)">
+        <div slot="header" style="text-align: center">订 单 编 号 ： {{selectOrder.orderId}}&emsp;&emsp;物流发货</div>
+        <i-form :model="sendInfo" ref="sendInfo" :label-width="100">
+            <Form-item label="快递公司" prop="expressCompanyId" :rule="{ required: true, message: '请选择快递公司', trigger: 'blur' }">
+                <i-select v-model="sendInfo.expressCompanyId" placeholder="请选择快递公司" filterable="true" style="width:200px">
+                    <i-option v-for="item in companyList" :value="item.id" :key="item.name">{{item.name}}</i-option>
+                </i-select>
+            </Form-item>
+            <Form-item v-for="(item, index) in sendInfo.expressNo" :key="index" label="快递单号"
+                       :prop="'expressNo.' + index + '.value'" :rules="{required: true, message: '快递单号不能为空', trigger: 'blur'}">
+                <i-input v-model="item.value" placeholder="请填写快递单号" style="width:200px"></i-input>
+                <i-button v-if="sendInfo.expressNo.length > 1" @click="removeInput(index)">删除</i-button>
+            </Form-item>
+            <Form-item>
+                <Row>
+                    <i-col span="12" v-if="sendInfo.expressNo.length < 5">
+                        <i-button type="dashed" long @click="addInput" icon="md-add">新增快递单号</i-button>
+                    </i-col>
+                </Row>
+            </Form-item>
+        </i-form>
+        <div slot="footer">
+            <i-button @click="sendLogistic(false)">取消</i-button>
+            <i-button type="primary" @click="sendLogistic(true)">发货</i-button>
+        </div>
+    </Modal>
+
+    <Modal class="refund" v-model="refundModal" :mask-closable="false" @on-cancel="addRefund(false)" width="600px">
+        <div slot="header" style="text-align: center">申请退款</div>
+        <div style="padding-bottom: 20px;border-bottom: 1px dotted rgb(226, 226, 226);">
+            <h1 style="font-size: 20px;color: #2679b5">
+                <Icon type="logo-yen"></Icon>申请退款&emsp;
+                <small style="font-size: 14px;color: black">
+                    {{"订单编号：" + selectOrder.orderId + "【" + user.companyName + "】"}}
+                </small>
+            </h1>
+        </div>
+        <i-form :model="refundDto" ref="refundDto" :label-width="100" style="padding-top: 20px">
+            <Form-item label="退款类型">
+                <radio-group v-model="refundDto.refundType">
+                    <Radio :label="1">整单退款</Radio>
+                    <Radio :label="2">部分退款</Radio>
+                </radio-group>
+            </Form-item>
+            <Form-item v-if="refundDto.refundType == 1" label="退款金额">
+                <i-input v-model="selectOrder.totalAmount" disabled style="width:100px"></i-input>
+            </Form-item>
+            <Form-item label="退款原因" prop="reason" :rules="{required: true, message: '退款原因不能为空', trigger: 'blur'}">
+                <i-select v-model="refundDto.reason" placeholder="请选择退款原因" filterable="true" style="width:250px">
+                    <i-option v-for="reason in refundReasonList" :value="reason.value+''" :key="reason.name">{{reason.name}}</i-option>
+                </i-select>
+            </Form-item>
+            <Form-item label="备注" prop="remark" :rules="{required: true, message: '备注不能为空', trigger: 'blur'}">
+                <i-input type="textarea" :autosize="true" v-model="refundDto.remark"
+                         placeholder="请填写备注" style="width:250px"></i-input>
+            </Form-item>
+        </i-form>
+        <div v-if="refundDto.refundType == 2" style="padding-bottom: 20px;border-top: 1px dotted rgb(226, 226, 226);">
+            <h1 style="font-size: 18px;text-align: center">请填写退款数量</h1>
+        </div>
+        <i-table v-if="refundDto.refundType == 2" :disabled-hover="true" border :columns="refundHead" :data="detailList" :height="tableHeight"></i-table>
+        <div slot="footer" style="text-align: center">
+            <i-button type="primary" @click="addRefund(true)">提交</i-button>
+            <i-button @click="addRefund(false)">清空</i-button>
+        </div>
+    </Modal>
+</div>
+
+<div th:replace="common/script::footer_script"></div>
+<script type="text/babel" th:src="${staticUrl} + '/common/axios/download.js?version=' + ${version}"></script>
+<script type="text/babel" th:src="${staticUrl}+'/main/js/order/list.js'"></script>
+</body>
+</html>

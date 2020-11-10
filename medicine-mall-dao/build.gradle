@@ -1,0 +1,10 @@
+configurations {
+	provided
+}
+
+dependencies {
+	compile project(':medicine-mall-domain')
+	compile("mysql:mysql-connector-java:${mysqlVersion}")
+	compile ("com.alibaba:druid-spring-boot-starter:${springBootDruidVersion}")
+}
+

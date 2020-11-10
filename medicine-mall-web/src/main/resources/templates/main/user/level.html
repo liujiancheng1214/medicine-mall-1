@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="common/header::common_head"/>
+    <link rel="stylesheet" th:href="${staticUrl} + '/main/css/sys/level.css'">
+</head>
+<body>
+<div id="sys_level" v-cloak>
+    <div id="btn-action-group">
+        <i-button type="success" @click="addLevel" shape="circle">新增等级</i-button>
+    </div>
+    <i-table id="list" border :columns="columns1" ref="levelTable" :data="levelList" @on-select="select"
+             @on-select-all="selectAll" @on-selection-change="selectChange"></i-table>
+    <div style="margin: 10px;overflow: hidden">
+        <div style="float: right;">
+            <Page show-sizer @on-page-size-change="pageSizeChange" :page-size-opts="pageSizeOpts"
+                  @on-change="pageChange" :total="total" :current="current" :page-size="size" :show-total="true"></Page>
+        </div>
+    </div>
+    <Modal v-model="addLevel_modal" v-bind:title="levelTitle" :loading="loading" @on-ok="saveLevelSubmit"
+           @on-cancel="addLevel_modal=false">
+        <i-form ref="addLevelForm" :model="newLevel" :rules="ruleValidate" :label-width="80">
+            <Form-item label="等级名称" prop="levelName"
+                       :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                <i-input v-model="newLevel.levelName" placeholder="请输入等级名称" @on-change="loading=false"></i-input>
+            </Form-item>
+            <Form-item label="等级值" prop="levelValue">
+                <i-input v-model="newLevel.levelValue" number placeholder="请输入等级值" @on-change="loading=false"></i-input>
+            </Form-item>
+            <Form-item label="图标" prop="icon" :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                <i-input v-model="newLevel.icon" placeholder="图片地址" @on-change="loading=false"></i-input>
+                <Upload :before-upload="uploadFile" action="">
+                    <i-button type="text" icon="ios-cloud-upload-outline">上传图片</i-button>
+                </Upload>
+                <img style="max-width: 100px;max-height: 100px;" :src="newLevel.icon"  />
+            </Form-item>
+        </i-form>
+    </Modal>
+</div>
+<div th:replace="common/script::footer_script"></div>
+<script type="text/babel" th:src="${staticUrl}+'/main/js/sys/level.js'"></script>
+<script type="text/babel" th:src="${staticUrl} + '/common/axios/upload.js?version=' + ${version}"></script>
+</body>
+</html>

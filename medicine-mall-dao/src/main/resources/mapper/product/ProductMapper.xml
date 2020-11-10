@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jdcloud.medicine.mall.dao.product.ProductMapper" >
+
+  <sql id="Base_Column_List" >
+    id,
+    level,
+    parent_id,
+    name,
+    sort,
+    enable,
+    create_time,
+    update_time
+  </sql>
+  <!--删除商品-->
+  <update id="delectById" parameterType="java.lang.Integer">
+        UPDATE t_product SET is_deleted = 1 WHERE ID = #{id}
+  </update>
+
+  <!--上架商品-->
+  <update id="onTheShelf" parameterType="java.lang.Integer">
+        UPDATE t_product SET in_sale = 1 WHERE ID = #{id}
+  </update>
+  <select id="selectByName" parameterType="java.lang.String" resultType="cn.jdcloud.medicine.mall.domain.product.Product">
+    select <include refid="t_product_List"></include>
+    from t_product t
+    <where>
+      is_deleted = 0
+      <if test="userId != null">
+        and user_id = #{userId}
+      </if>
+      <if test="name != null">
+        and `name` like "%"#{name}"%"
+      </if>
+    </where>
+  </select>
+
+  <select id="listByTerm" resultType="cn.jdcloud.medicine.mall.domain.product.Product">
+    select <include refid="t_product_List"></include>
+    from t_product t
+    <where>
+      is_deleted = 0
+      <if test="varieties != null">
+        and category_id1 = #{varieties}
+      </if>
+      <if test="userId != null">
+        and user_id = #{userId}
+      </if>
+    </where>
+    <if test="salesVolume != null||price != null">
+      order by
+    </if>
+    <if test="salesVolume != null">
+      sale_num ${salesVolume}
+    </if>
+    <if test="price != null">
+      <if test="salesVolume != null">
+        ,
+      </if>
+      first_price ${price}
+    </if>
+  </select>
+  <!--下架商品-->
+  <update id="offTheShelf" parameterType="java.lang.Integer">
+    UPDATE t_product SET in_sale = 0 WHERE ID = #{id}
+  </update>
+
+  <!--编辑商品-->
+  <update id="edit" parameterType="java.lang.Integer">
+    UPDATE t_product
+    <set >
+      <if test="icon_img != null" >
+        icon_img = #{icon_img},
+      </if>
+      <if test="name != null" >
+        name = #{name},
+      </if>
+      <if test="province_id != null" >
+        province_id = #{province_id},
+      </if>
+      <if test="province_name != null" >
+        province_name = #{province_name},
+      </if>
+      <if test="city_id != null" >
+        city_id = #{city_id},
+      </if>
+      <if test="city_name != null" >
+        city_name = #{city_name},
+      </if>
+      <if test="category_id1 != null" >
+        category_id1 = #{category_id1},
+      </if>
+      <if test="category_id2 != null" >
+        category_id2 = #{category_id2},
+      </if>
+      <if test="part_name != null" >
+        part_name = #{part_name},
+      </if>
+      <if test="first_price != null" >
+        first_price = #{first_price},
+      </if>
+      <if test="second_price != null" >
+        second_price = #{second_price},
+      </if>
+      <if test="detail != null" >
+        detail = #{detail},
+      </if>
+    </set>
+    where ID = #{id}
+  </update>
+
+  <sql id="t_product_List">
+    id,type,user_id,`name`,icon_img,category_id1,category_id2,
+    province_id,province_name,city_id,city_name,part_name,first_price,
+    second_price,detail,sale_num,in_sale,is_deleted,create_time,update_time
+  </sql>
+
+  <select id="selProductByNameList" parameterType="java.lang.String" resultType="cn.jdcloud.medicine.mall.domain.product.Product">
+  select <include refid="t_product_List"></include>
+   from t_product t
+    <where>
+     <if test="name != null">
+        `name` like "%"#{name}"%"
+      </if>
+    </where>
+  </select>
+
+  <select id="listBySort" resultType="cn.jdcloud.medicine.mall.domain.product.Product">
+  select <include refid="t_product_List"></include>
+  from t_product t
+  <where>
+    is_deleted = 0 and `type` = 1
+    <if test="varieties != null">
+      AND category_id1 = #{varieties}
+    </if>
+    <if test="provinceId != null">
+      AND province_id = #{provinceId}
+    </if>
+  </where>
+  <if test="salesVolume != null||price != null">
+    order by
+  </if>
+  <if test="salesVolume != null">
+    sale_num ${salesVolume}
+  </if>
+  <if test="price != null">
+    <if test="salesVolume != null">
+      ,
+    </if>
+    first_price ${price}
+  </if>
+  </select>
+
+
+
+</mapper>

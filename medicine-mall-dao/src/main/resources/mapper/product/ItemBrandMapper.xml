@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.jdcloud.medicine.mall.dao.product.ItemBrandMapper">
+    <select id = "detail" resultType = "java.util.Map">
+        SELECT
+          t1.`id`,
+          t1.`parent_id`,
+          t1.`ibrand_name`,
+          t1.`brand_img`,
+          t1.`sort`,
+          t1.`creator`,
+          t1.`create_time`,
+          t1.`updator`,
+          t1.`update_time`,
+          t1.`is_deleted`,
+            t2.`ibrand_name` parent_name
+        FROM t_item_brand t1 LEFT JOIN t_item_brand t2
+        ON t1.parent_id = t2.id
+        WHERE t1.id = #{id}
+    </select>
+    <select id = "subNode" resultType = "java.util.Map">
+        SELECT
+          t1.`id`,
+          t1.`parent_id`,
+          t1.`ibrand_name`,
+          t1.`brand_img`,
+          t1.`sort`,
+          t1.`is_deleted`,
+            count(t2.id) child
+        FROM t_item_brand t1 LEFT JOIN t_item_brand t2
+        ON t1.id = t2.parent_id
+        WHERE t1.parent_id = #{parentId}
+        GROUP BY t1.id
+    </select>
+</mapper>

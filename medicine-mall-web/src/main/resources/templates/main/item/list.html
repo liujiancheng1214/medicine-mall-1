@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="common/header::common_head"/>
+    <link th:href="${staticUrl} + '/common/element-ui/theme-chalk/index.css?version=' + ${version}" rel="stylesheet"
+          type="text/css">
+    <script th:src="${staticUrl} + '/common/element-ui/index.js?version=' + ${version}"></script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .ivu-table-cell {
+            padding-bottom: 10px;
+        }
+
+        .ivu-table-cell p {
+            margin-top: 10px;
+        }
+
+        .img-wrap {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            text-align: center;
+            line-height: 100px;
+            border: 1px solid #f2f2f2;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #fff;
+            position: relative;
+        }
+
+        .img-wrap img {
+            width: 100px;
+            height: 100px;
+        }
+
+        .img-cover {
+            display: none;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, .6);
+        }
+
+        .img-wrap:hover .img-cover {
+            display: block;
+        }
+
+        .img-cover i {
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+            margin: 0 2px;
+        }
+        .ivu-table .ivu-table-header th {
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .ivu-table .ivu-table-header .ivu-table-cell {
+            font-size: 13px;
+            padding-bottom: 0px
+        }
+
+    </style>
+</head>
+<body>
+<div id="app" v-cloak style="min-width: 1200px">
+    <Tabs type="card" v-model="conditions.tab" style="padding: 20px 10px" @on-click="loadData">
+        <Tab-pane label="已上架" name="0"></Tab-pane>
+        <Tab-pane label="已下架" name="1"></Tab-pane>
+        <Tab-pane label="已售罄" name="2"></Tab-pane>
+    </Tabs>
+    <div style="margin:0 20px;">
+        <Row type="flex" align="middle" style="margin-bottom: 20px">
+            <i-col span="6">
+                <i-input search placeholder="商品编码/商品名称/批准文号" v-model="conditions.searchValue" @on-search="loadData"/>
+            </i-col>
+            <i-col span="2" offset="8">
+                <Upload action="" :before-upload="importData">
+                    <i-button type="success" style="margin-top: 9px" shape="circle" size="large">导入数据</i-button>
+                </Upload>
+            </i-col>
+            <i-col span="2">
+                <i-button type="primary" @click="importTemplate" shape="circle" size="large">
+                    导入模板
+                </i-button>
+            </i-col>
+            <i-col span="2">
+                <i-button type="primary" v-if="selectList.length==0" @click="exportItem" shape="circle" size="large">
+                    导出全部
+                </i-button>
+                <i-button type="primary" v-else @click="exportItem('1')" shape="circle" size="large">
+                    导出已选
+                </i-button>
+            </i-col>
+            <i-col span="2">
+                <i-button type="primary" v-if="conditions.tab==1" :disabled="selectList.length == 0"
+                          @click="batchChangeState" shape="circle" size="large">
+                    批量上架
+                </i-button>
+                <i-button type="primary" v-if="conditions.tab==0" :disabled="selectList.length == 0"
+                          @click="batchChangeState" shape="circle" size="large">
+                    批量下架
+                </i-button>
+            </i-col>
+            <i-col span="2">
+                <i-button type="primary" @click="()=>{showEdit = true}" shape="circle"
+                          size="large">新增商品
+                </i-button>
+            </i-col>
+        </Row>
+        <i-table :height="tableHeight" ref="table" stripe border :loading="loading" @on-selection-change="getSelection"
+                 :columns="tableHead"
+                 :data="tableData"></i-table>
+        <div style="margin: 10px;">
+            <div style="float: right;">
+                <Page :total="page.total" :current="page.current" :page-size="page.size" show-total
+                      @on-change="changePage" show-sizer show-elevator></Page>
+            </div>
+        </div>
+    </div>
+    <Drawer
+            title="编辑商品"
+            v-model="showEdit"
+            width="100"
+            :mask-closable="false"
+            @on-close="emptyForm"
+    >
+        <i-form ref="editForm" :model="newItem" style="min-width: 1160px" :label-width="120" :rules="ruleValidate">
+            <Divider orientation="left" style="font-size: 20px">基本信息</Divider>
+            <div style="padding-left: 50px;">
+
+                <Row type="flex" align="middle">
+                    <i-col span="4">
+                        <Form-item label="产品封面" prop="imgCover">
+                            <Upload v-if="newItem.imgCover == null" :before-upload="(file) => uploadImg(file,'Cover')"
+                                    action="">
+                                <div style="width: 100px;height: 100px;border: 1px dashed black;cursor: pointer;padding: 30px">
+                                    <Icon type="ios-camera" size="40"></Icon>
+                                </div>
+                            </Upload>
+                            <div class="img-wrap" v-if="newItem.imgCover != null">
+                                <img :src="newItem.imgCover"/>
+                                <div class="img-cover">
+                                    <Icon type="ios-trash-outline" @click="imgRemove('Cover')"></Icon>
+                                </div>
+                            </div>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="4">
+                        <Form-item label="产品正面" prop="imgFront">
+                            <Upload v-if="newItem.imgFront == null" :before-upload="(file) => uploadImg(file,'Front')"
+                                    action="">
+                                <div style="width: 100px;height: 100px;border: 1px dashed black;cursor: pointer;padding: 30px">
+                                    <Icon type="ios-camera" size="40"></Icon>
+                                </div>
+                            </Upload>
+                            <div class="img-wrap" v-if="newItem.imgFront != null">
+                                <img :src="newItem.imgFront"/>
+                                <div class="img-cover">
+                                    <Icon type="ios-trash-outline" @click="imgRemove('Front')"></Icon>
+                                </div>
+                            </div>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="4">
+                        <Form-item label="产品反面" prop="imgReverse">
+                            <Upload v-if="newItem.imgReverse == null"
+                                    :before-upload="(file) => uploadImg(file,'Reverse')" action="">
+                                <div style="width: 100px;height: 100px;border: 1px dashed black;cursor: pointer;padding: 30px">
+                                    <Icon type="ios-camera" size="40"></Icon>
+                                </div>
+                            </Upload>
+                            <div class="img-wrap" v-if="newItem.imgReverse != null">
+                                <img :src="newItem.imgReverse"/>
+                                <div class="img-cover">
+                                    <Icon type="ios-trash-outline" @click="imgRemove('Reverse')"></Icon>
+                                </div>
+                            </div>
+                        </Form-item>
+                    </i-col>
+                </Row>
+
+
+                <Form-item label="商品名称" prop="itemName"
+                           :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                    <i-input style="width: 500px" req v-model="newItem.itemName"></i-input>
+                </Form-item>
+                <Row type="flex" align="middle">
+                    <i-col span="7">
+                        <Form-item label="商品品牌" prop="itemBrandId">
+                            <i-select v-model="newItem.itemBrandId" filterable style="width: 200px">
+                                <i-option v-for="item in brandList" :value="item.id" :key="item.id">{{ item.ibrandName
+                                    }}
+                                </i-option>
+                            </i-select>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="7">
+                        <Form-item label="商品类别" prop="itemCategoryId">
+                            <el-cascader ref="cascader" size="small" style="height: 32px;width: 300px"
+                                         :options="categoryData" :props="{emitPath: false}"
+                                         v-model="newItem.itemCategoryId" filterable></el-cascader>
+                        </Form-item>
+                    </i-col>
+                </Row>
+                <Form-item label="助记码" prop="helpCode">
+                    <i-input style="width: 500px" v-model="newItem.helpCode"></i-input>
+                </Form-item>
+                <Form-item label="商品编码" prop="itemNo"
+                           :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                    <i-input style="width: 500px" v-model="newItem.itemNo"></i-input>
+                </Form-item>
+                <Row type="flex" align="middle">
+                    <i-col span="9">
+                        <Form-item label="批准文号" prop="approvalNo">
+                            <i-input style="width: 320px" v-model="newItem.approvalNo"></i-input>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="9">
+                        <Form-item label="批准文号有效期" prop="approvalNoEndAt">
+                            <Date-picker type="date" v-model="newItem.approvalNoEndAt"
+                                         style="width: 320px"></Date-picker>
+                        </Form-item>
+                    </i-col>
+                </Row>
+                <Row type="flex" align="middle">
+                    <i-col span="9">
+                        <Form-item label="注册证号" prop="regNo">
+                            <i-input style="width: 320px" v-model="newItem.regNo"></i-input>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="9">
+                        <Form-item label="注册证号有效期" prop="regNoEndAt">
+                            <Date-picker type="date" v-model="newItem.regNoEndAt"
+                                         style="width: 320px"></Date-picker>
+                        </Form-item>
+                    </i-col>
+                </Row>
+                <Row type="flex" align="middle">
+                    <i-col span="9">
+                        <Form-item label="商品规格" prop="spec"
+                                   :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                            <i-input style="width: 320px" v-model="newItem.spec"></i-input>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="9">
+                        <Form-item label="单位" prop="unit"
+                                   :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                            <i-input style="width: 320px" v-model="newItem.unit"></i-input>
+                        </Form-item>
+                    </i-col>
+                </Row>
+            </div>
+            <Divider orientation="left" style="font-size: 20px">价格</Divider>
+            <div style="padding-left: 50px">
+                <Form-item label="零售价格" prop="retailPrice">
+                    <i-input style="width: 500px" v-model="newItem.retailPrice" number></i-input>
+                </Form-item>
+                <Form-item label="起购价格" prop="startPurchaseAmount">
+                    <i-input style="width: 500px" number v-model="newItem.startPurchaseAmount"></i-input>
+                </Form-item>
+                <Form-item label="暂估采购金额" prop="costPrice">
+                    <i-input style="width: 500px" number v-model="newItem.costPrice"></i-input>
+                </Form-item>
+                <Form-item label="库存周转天数" prop="revolveDay">
+                    <i-input style="width: 320px" number v-model="newItem.revolveDay"></i-input>
+                </Form-item>
+                <Row type="flex" align="middle">
+                    <i-col span="9">
+                        <Form-item label="进项税" prop="inTax">
+                            <i-input style="width: 320px" number v-model="newItem.inTax"></i-input>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="9">
+                        <Form-item label="销项税" prop="outTax">
+                            <i-input style="width: 320px" number v-model="newItem.outTax"></i-input>
+                        </Form-item>
+                    </i-col>
+                </Row>
+            </div>
+            <Divider orientation="left" style="font-size: 20px">商品信息</Divider>
+            <div style="padding-left: 50px">
+                <Form-item label="大包装规格" prop="bigPackage">
+                    <i-input style="width: 500px" number v-model="newItem.bigPackage"></i-input>
+                </Form-item>
+                <Form-item label="中包装规格" prop="mediumPackage">
+                    <i-input style="width: 500px" type="number"
+                             v-model="newItem.mediumPackage"></i-input>
+                </Form-item>
+                <Form-item label="有效期（月）" prop="expiryDate">
+                    <i-input style="width: 500px" number v-model="newItem.expiryDate"></i-input>
+                </Form-item>
+                <Form-item label="商品标签" prop="tags">
+                    <i-input style="width: 500px" v-model="newItem.tags"></i-input>
+                </Form-item>
+                <Form-item label="生产厂家" prop="factory"
+                           :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                    <i-input style="width: 500px" v-model="newItem.factory"></i-input>
+                </Form-item>
+                <Form-item label="产地" prop="originPlace">
+                    <i-input style="width: 500px" v-model="newItem.originPlace"></i-input>
+                </Form-item>
+                <Form-item label="上市持有人" prop="licenseHolder">
+                    <i-input style="width: 500px" v-model="newItem.licenseHolder"></i-input>
+                </Form-item>
+                <Form-item label="商品描述" prop="remark">
+                    <i-input type="textarea" :rows="3" style="width: 500px"
+                             v-model="newItem.remark"></i-input>
+                </Form-item>
+                <Form-item label="存储方式" prop="storageMode">
+                    <i-select v-model="newItem.storageMode" style="width: 200px">
+                        <i-option value="常温" :key="1">常温</i-option>
+                        <i-option value="阴凉" :key="2">阴凉</i-option>
+                        <i-option value="冷藏" :key="1">冷藏</i-option>
+                    </i-select>
+                </Form-item>
+                <Form-item label="效果" prop="effect">
+                    <i-input type="textarea" :rows="3" style="width: 500px"
+                             v-model="newItem.effect"></i-input>
+                </Form-item>
+                <Form-item label="针对人群" prop="forPeople">
+                    <i-input type="textarea" :rows="3" style="width: 500px"
+                             v-model="newItem.forPeople"></i-input>
+                </Form-item>
+                <Form-item label="销售策略" prop="saleStrategy">
+                    <i-input type="textarea" :rows="3" style="width: 500px"
+                             v-model="newItem.saleStrategy"></i-input>
+                </Form-item>
+                <Row>
+                    <i-col span="6">
+                        <Form-item label="重点商品" prop="important">
+                            <i-select v-model="newItem.important" style="width:200px">
+                                <i-option value="0" :key="0">否</i-option>
+                                <i-option value="1" :key="1">是</i-option>
+                            </i-select>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="6">
+                        <Form-item label="经营方式" prop="businessModel">
+                            <i-select v-model="newItem.businessModel" style="width:200px">
+                                <i-option value="1" :key="1">直营</i-option>
+                                <i-option value="2" :key="2">联营</i-option>
+                            </i-select>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="6">
+                        <Form-item label="是否停购" prop="stopBuy">
+                            <i-select v-model="newItem.stopBuy" style="width:200px">
+                                <i-option value="0" :key="0">否</i-option>
+                                <i-option value="1" :key="1">是</i-option>
+                            </i-select>
+                        </Form-item>
+                    </i-col>
+                </Row>
+            </div>
+        </i-form>
+        <i-form ref="batchForm" :model="newItem.itemBatch" :label-width="120">
+            <Divider orientation="left" style="font-size: 20px">商品库存</Divider>
+            <div style="padding-left: 50px">
+                <i-button type="primary" style="width: 150px;margin: 10px 120px" @click="addBatchRow">增加</i-button>
+                <Row v-for="(item, index) in newItem.itemBatch" :key="index">
+                    <i-col span="5">
+                        <Form-item label="批号"
+                                   :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'blur'}">
+                            <i-input style="width: 180px" v-model="item.batchNo"></i-input>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="5">
+                        <Form-item label="生产日期"
+                                   :rules="{required: true, message: '当前项为必填项，不能为空', trigger: 'change',pattern: /.+/}">
+                            <Date-picker type="date" v-model="item.producedTime"
+                                         style="width: 180px"></Date-picker>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="5">
+                        <Form-item label="库存" :prop="index+'.qty'" :rules="[{required: true, validator: validateTest, trigger: 'blur'}]">
+                            <i-input style="width: 180px" v-model="item.qty"></i-input>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="5">
+                        <Form-item label="价格" :prop="index+'.price'" :rules="[{required: true, validator: validateTest, trigger: 'blur'}]">
+                            <i-input style="width: 180px" v-model="item.price"></i-input>
+                        </Form-item>
+                    </i-col>
+                    <i-col span="3" offset="1">
+                        <i-button type="error" style="width: 150px" @click="deleteRow(index)">删除</i-button>
+                    </i-col>
+                </Row>
+            </div>
+        </i-form>
+        <Divider orientation="left" style="font-size: 20px"></Divider>
+        <Row>
+            <i-col span="3" offset="3">
+                <i-button type="primary" style="width: 150px" @click="saveItem">提交</i-button>
+            </i-col>
+            <i-col span="3" offset="3">
+                <i-button style="width: 150px" @click="reset">重置</i-button>
+            </i-col>
+        </Row>
+    </Drawer>
+</div>
+<div th:replace="common/script::footer_script"></div>
+<script type="text/babel" th:src="${staticUrl} + '/common/axios/upload.js?version=' + ${version}"></script>
+<script type="text/babel" th:src="${staticUrl} + '/common/axios/download.js?version=' + ${version}"></script>
+<script type="text/babel" th:src="${staticUrl}+'/main/js/item/list.js'"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+/* 表单最外层容器 */
+.pageMain{
+    width:500px;
+    padding:18px;
+    box-sizing: border-box;
+}
+/* msg提示 */
+.msgStyle{
+    text-align:center;
+    padding-right:16px;
+}
+/* 左边距 */
+.marginLeft8{
+    margin-left:8px;
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="common/header::common_head"/>
+    <style>
+        #btn-action-group {
+            padding: 20px 20px 0px 20px;
+        }
+        [v-cloak] {
+            display: none;
+        }
+        .ivu-table .ivu-table-header .ivu-table-cell {
+            font-size: 13px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <div id="btn-action-group">
+        <Row type="flex" align="middle" style="margin-bottom: 20px">
+            <i-col span="7">
+                <i-input search placeholder="角色名称" v-model="searchValue" @on-search="loadData"/>
+            </i-col>
+            <i-col span="2" offset="15">
+                <i-button type="primary" style="float: right;margin-top: 5px" @click="addRole" shape="circle">新增角色
+                </i-button>
+            </i-col>
+        </Row>
+    </div>
+    <i-table :height="tableHeight" border :loading="loading" :columns="tableHead" :data="tableData"></i-table>
+    <div style="margin: 10px;overflow: hidden">
+        <div style="float: right;">
+            <Page :total="page.total" :current="page.current" :page-size="page.size" show-total
+                  @on-change="changePage"></Page>
+        </div>
+    </div>
+    <Modal v-model="showEdit" title="新增角色" @on-ok="saveRole" @on-cancel="clear" :mask-closable="false">
+        <Row type="flex" justify="center" align="middle">
+            <i-col span="4">角色名称：</i-col>
+            <i-col span="20">
+                <i-input v-model="newRole.roleName" size="large" placeholder="角色名称" clearable maxlength="50"/>
+            </i-col>
+        </Row>
+        <p style="margin-top: 10px">权限选择：</p>
+        <div style="max-height: 450px;overflow: auto">
+            <Tree :data="data" @on-check-change="checked" check-strictly ref="tree" show-checkbox></Tree>
+        </div>
+    </Modal>
+</div>
+<div th:replace="common/script::footer_script"></div>
+<script type="text/babel" th:src="${staticUrl}+'/main/js/sys/role.js'"></script>
+</body>
+</html>
