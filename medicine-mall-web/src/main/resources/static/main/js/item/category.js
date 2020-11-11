@@ -229,7 +229,7 @@ window.vm = new Vue({
                             marginRight: '8px'
                         },
                         on: {
-                            click: () => { 
+                            click: () => {
                                 this.selectItem = data;
                                 this.isAddSub = true;
                                 this.addCategory_modal = true;
@@ -392,18 +392,16 @@ window.vm = new Vue({
         },
         uploadFile(file){
             let formData = new FormData();
-            formData.append(file.name,file);
-            upload.post('/upload/uploadFile',formData).then((res)=>{
+            formData.append("file", file);
+            upload.post('/file/fileUpload',formData).then((res)=>{
                 debugger;
-                let fileUrl = res.data.data.downloadUrl.toString();
-                console.log(fileUrl);
+                let fileUrl = res.data.data
                 if (this.isNewItem){
                     this.newCategory.categoryImg = fileUrl;
                 }
                 if (!this.isNewItem){
                     this.selectItem.categoryImg = fileUrl;
                 }
-                console.log(this.newCategory);
                 this.$forceUpdate();
             }).catch((error)=>{
                 console.log(error);

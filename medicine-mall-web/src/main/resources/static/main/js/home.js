@@ -10,9 +10,9 @@ window.$vue = new Vue({
     methods: {
         uploadFile(file){
             let formData = new FormData();
-            formData.append(file.name,file);
+            formData.append("file", file);
             debugger;
-            upload.post('/upload/uploadFile',formData).then((res)=>{
+            upload.post('/file/fileUpload',formData).then((res)=>{
                 debugger;
                 this.fileSrc = res.data.data;
             }).catch((error)=>{

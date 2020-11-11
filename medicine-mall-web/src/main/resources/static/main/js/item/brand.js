@@ -206,7 +206,7 @@ window.vm = new Vue({
                             marginRight: '8px'
                         },
                         on: {
-                            click: () => { 
+                            click: () => {
                                 this.selectItem = data;
                                 this.addBrand_modal = true;
                                 this.isAddSub = true;
@@ -222,7 +222,7 @@ window.vm = new Vue({
                             marginRight: '8px'
                         },
                         on: {
-                            click: () => { 
+                            click: () => {
                                 this.selectItem = data;
                                 this.editBrand_modal = true;
                             }
@@ -382,9 +382,9 @@ window.vm = new Vue({
         },
         uploadFile(file){
             let formData = new FormData();
-            formData.append(file.name,file);
-            upload.post('/upload/uploadFile',formData).then((res)=>{
-                let fileUrl = res.data.data.downloadUrl.toString();
+            formData.append("file", file);
+            upload.post('/file/fileUpload',formData).then((res)=>{
+                let fileUrl = res.data.data;
                 console.log(fileUrl);
                 if (this.isNewItem){
                     this.newBrand.brandImg = fileUrl;

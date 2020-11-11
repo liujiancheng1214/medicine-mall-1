@@ -231,9 +231,8 @@ window.$vue = new Vue({
         uploadFile(file) {
             let formData = new FormData();
             formData.append(file.name, file);
-            upload.post('/upload/uploadFile', formData).then((res) => {
-                debugger;
-                let fileUrl = res.data.data.downloadUrl.toString();
+            upload.post('/file/fileUpload', formData).then((res) => {
+                let fileUrl = res.data.data
                 this.newLevel.icon = fileUrl;
             }).catch((error) => {
                 console.log(error);

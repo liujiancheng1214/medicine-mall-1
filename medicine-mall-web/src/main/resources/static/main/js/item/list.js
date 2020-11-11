@@ -378,14 +378,14 @@ window.vm = new Vue({
         },
         uploadImg(file, img) {
             let formData = new FormData();
-            formData.append(file.name, file);
-            upload.post('/upload/uploadFile', formData).then((res) => {
+            formData.append("file", file);
+            upload.post('/file/fileUpload', formData).then((res) => {
                 if (img == "Cover") {
-                    this.newItem.imgCover = res.data.data.downloadUrl;
+                    this.newItem.imgCover = res.data.data;
                 } else if (img == "Front") {
-                    this.newItem.imgFront = res.data.data.downloadUrl;
+                    this.newItem.imgFront = res.data.data;
                 } else if (img == "Reverse") {
-                    this.newItem.imgReverse = res.data.data.downloadUrl;
+                    this.newItem.imgReverse = res.data.data;
                 }
             }).catch((error) => {
                 console.log(error);
