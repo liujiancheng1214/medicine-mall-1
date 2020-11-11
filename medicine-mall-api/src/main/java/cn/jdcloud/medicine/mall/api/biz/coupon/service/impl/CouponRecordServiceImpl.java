@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
@@ -283,5 +284,10 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
 				throw new ApiException(1000, "发放失败，类别更新失败");
 			}
 		}
+	}
+	@Override
+	public int queryCouponNum(Integer userId) {
+		return couponRecordMapper.selectCount(new QueryWrapper<CouponRecord>()
+				.eq("user_id", userId).eq("coupon_status", 1));
 	}
 }

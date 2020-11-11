@@ -1,13 +1,20 @@
 package cn.jdcloud.medicine.mall.api.biz.user.service.impl;
 
 import java.io.IOException;
-import java.util.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
-import cn.jdcloud.medicine.mall.domain.user.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,16 +27,24 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.jdcloud.framework.core.exception.ApiException;
 import cn.jdcloud.framework.utils.StringUtils;
+import cn.jdcloud.medicine.mall.api.biz.coupon.service.CouponRecordService;
 import cn.jdcloud.medicine.mall.api.biz.user.enums.UserCode;
 import cn.jdcloud.medicine.mall.api.biz.user.service.UserService;
 import cn.jdcloud.medicine.mall.api.biz.user.utils.EncryptUtils;
 import cn.jdcloud.medicine.mall.api.biz.user.utils.ExcelUtil;
 import cn.jdcloud.medicine.mall.api.biz.user.vo.UserAddVo;
+import cn.jdcloud.medicine.mall.api.biz.user.vo.UserCenterVo;
 import cn.jdcloud.medicine.mall.api.common.utils.BeanUtil;
 import cn.jdcloud.medicine.mall.dao.sys.RegionMapper;
 import cn.jdcloud.medicine.mall.dao.user.UserAddressMapper;
 import cn.jdcloud.medicine.mall.dao.user.UserMapper;
 import cn.jdcloud.medicine.mall.domain.sys.Region;
+import cn.jdcloud.medicine.mall.domain.user.User;
+import cn.jdcloud.medicine.mall.domain.user.UserAddress;
+import cn.jdcloud.medicine.mall.domain.user.UserDto;
+import cn.jdcloud.medicine.mall.domain.user.UserExcel;
+import cn.jdcloud.medicine.mall.domain.user.UserImgVO;
+import cn.jdcloud.medicine.mall.domain.user.UserResult;
 
 /**
  * @author chenQF
@@ -47,6 +62,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     RegionMapper regionMapper;
     @Resource
     UserAddressMapper userAddressMapper;
+    @Resource
+    CouponRecordService couponRecordService;
+
 
     @Override
     public Map listUser(Page<UserResult> page, UserDto userDto) {
@@ -359,5 +377,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 		User user=userMapper.selectOne(queryWrapper);
 		return user;
 	}
-
+	@Override
+	public UserCenterVo queryUserCenter(Integer userId) {
+		UserCenterVo  userCenterVo=new UserCenterVo();
+		User user=userMapper.selectById(userId);
+		userCenterVo.setAddress(user.getCompanyAddress());
+		userCenterVo.setBalance(new BigDecimal(0));
+		userCenterVo.setCouponNum(couponRecordService.queryCouponNum(userId));
+		userCenterVo.setFanyon(new BigDecimal(0));
+		userCenterVo.setHeadImage(user.getHeadImg());
+		userCenterVo.setIntegral(0);
+		userCenterVo.setMobile(user.getMobile());
+		userCenterVo.setName(user.getContactName());
+		return userCenterVo;
+	}
 }

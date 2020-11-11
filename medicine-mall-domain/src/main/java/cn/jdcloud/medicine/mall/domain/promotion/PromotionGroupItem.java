@@ -13,7 +13,7 @@ public class PromotionGroupItem extends BaseDomain {
     private Integer id;
     /**活动id*/
     private Integer promotionId;
-    /**商品编码*/
+    /**商品编码 ********** 多个对象*/
     private String itemNo;
     /**商品团购单价*/
     private BigDecimal itemGroupPrice;

@@ -8,15 +8,16 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
-import cn.jdcloud.medicine.mall.domain.user.UserImgVO;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import cn.jdcloud.medicine.mall.api.biz.user.vo.UserAddVo;
+import cn.jdcloud.medicine.mall.api.biz.user.vo.UserCenterVo;
 import cn.jdcloud.medicine.mall.domain.user.User;
 import cn.jdcloud.medicine.mall.domain.user.UserDto;
+import cn.jdcloud.medicine.mall.domain.user.UserImgVO;
 import cn.jdcloud.medicine.mall.domain.user.UserResult;
 
 /**
@@ -24,7 +25,13 @@ import cn.jdcloud.medicine.mall.domain.user.UserResult;
  */
 public interface UserService extends IService<User>{
 
-
+	/**
+	 * 查询用户个人中心信息
+	 * @param userId
+	 * @return
+	 */
+	UserCenterVo queryUserCenter(Integer userId);
+	
 	User  queryUserByMobile(String mobil);
 	/**
 	 * 用户登录

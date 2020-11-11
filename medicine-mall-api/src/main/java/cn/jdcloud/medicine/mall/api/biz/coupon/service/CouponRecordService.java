@@ -19,6 +19,12 @@ import cn.jdcloud.medicine.mall.domain.coupon.CouponRecordResult;
  * @date 2020/8/20 0020 17:43
  */
 public interface CouponRecordService extends IService<CouponRecord> {
+	
+	/**
+	 * 查询可用优惠券数量
+	 */
+	
+	int  queryCouponNum(Integer userId);
     /**
      * 查询优惠券领取记录列表
      * @param page

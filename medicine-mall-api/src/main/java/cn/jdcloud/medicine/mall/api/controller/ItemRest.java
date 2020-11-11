@@ -6,6 +6,7 @@ import cn.jdcloud.medicine.mall.api.biz.product.vo.ItemDetailVo;
 import cn.jdcloud.medicine.mall.api.biz.product.vo.ItemVo;
 import cn.jdcloud.medicine.mall.api.biz.product.vo.PromotionItemDetailVo;
 import cn.jdcloud.medicine.mall.api.biz.user.service.FootprintService;
+import cn.jdcloud.medicine.mall.api.common.utils.UserContextUtil;
 import cn.jdcloud.medicine.mall.domain.product.Item;
 import cn.jdcloud.medicine.mall.api.params.ProductQueryParam;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -14,6 +15,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,11 +32,13 @@ public class ItemRest {
 	private ItemService itemService;
 	@Autowired
 	private FootprintService footprintService;
-
+	@Autowired
+	private UserContextUtil userContextUtil;
+	
 	@ApiOperation(value = "商品详情")
 	@GetMapping(value = "/queryItemDetail")
-	public ApiResult<ItemDetailVo> queryItemDetail(String itemNo){
-		Integer userId=1;
+	public ApiResult<ItemDetailVo> queryItemDetail(@RequestHeader("token") String token,String itemNo){
+		Integer userId=userContextUtil.tokenToUserId(token);
 		ItemDetailVo vo=itemService.queryItemDetail(userId,itemNo);
 		footprintService.addFootprint(userId, itemNo);
 		return ApiResult.ok(vo);
@@ -42,8 +46,8 @@ public class ItemRest {
 
 	@ApiOperation(value = "查询团购商品详情")
 	@GetMapping(value = "/queryPromotionItemDetail")
-	public ApiResult<PromotionItemDetailVo> queryPromotionItemDetail(String itemNo,Integer promotionId){
-		Integer userId=1;
+	public ApiResult<PromotionItemDetailVo> queryPromotionItemDetail(@RequestHeader("token") String token,String itemNo,Integer promotionId){
+		Integer userId=userContextUtil.tokenToUserId(token);
 		PromotionItemDetailVo vo=itemService.queryPromotionItemDetail(userId,itemNo,promotionId);
 		footprintService.addFootprint(userId, itemNo);
 		return ApiResult.ok(vo);

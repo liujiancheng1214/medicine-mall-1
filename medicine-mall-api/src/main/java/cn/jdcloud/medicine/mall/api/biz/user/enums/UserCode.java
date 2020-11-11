@@ -65,7 +65,8 @@ public enum UserCode implements ErrorCode{
 	/**995用户不存在**/
 	USER_BASE_NOT_EXIST(990, "用户不存在"),//用户不存在
 	/** 997 **/
-	LOGIN_IS_INVALID(997,"登录已失效，请重新登录"),
+	LOGIN_IS_INVALID(997,"请先进行登录"),
+	
 	/** 998 获取验证码的次数已达上限 **/
 	VERIFY_CODE_FAILED_COUNT_UPPER_LIMIT(998,"获取验证码的次数已达上限"),
 

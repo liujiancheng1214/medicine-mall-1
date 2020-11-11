@@ -1,10 +1,12 @@
 package cn.jdcloud.medicine.mall.dao.admin;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import cn.jdcloud.medicine.mall.domain.admin.Admin;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import cn.jdcloud.medicine.mall.domain.admin.Admin;
 
 public interface AdminMapper extends BaseMapper<Admin>{
 

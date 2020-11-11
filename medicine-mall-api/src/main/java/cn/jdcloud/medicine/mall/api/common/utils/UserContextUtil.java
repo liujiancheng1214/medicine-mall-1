@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import cn.jdcloud.framework.core.exception.ApiException;
+import cn.jdcloud.framework.utils.StringUtils;
 import cn.jdcloud.medicine.mall.api.biz.user.enums.UserCode;
 import cn.jdcloud.medicine.mall.domain.token.Token;
 
@@ -47,6 +48,7 @@ public class UserContextUtil {
 	}
 	
 	public   Integer tokenToUserId(String token) {
+		
 		BoundValueOperations<String, String> bvo = stringTemplate.boundValueOps(token);
 		String userId = bvo.get();
 		if(userId==null) {
