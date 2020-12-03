@@ -9,36 +9,28 @@
     <sql id="Example_Where_Clause">
         <where>
             1=1
-            /* 用户等级 */
             <if test="userDto.userLevelId != null and userDto.userLevelId != ''">
                 and tu.user_level_id = #{userDto.userLevelId}
             </if>
-            /* 注册时间区间 */
             <if test="userDto.startRegisterTime != null  and userDto.startRegisterTime != ''
             and userDto.endRegisterTime != null and userDto.endRegisterTime != ''">
                 and tu.create_time between #{userDto.startRegisterTime} and #{userDto.endRegisterTime}
             </if>
-            /* 省 */
             <if test="userDto.provinceId != null and userDto.provinceId != ''">
                 and tu.province_id = #{userDto.provinceId}
             </if>
-            /* 市 */
             <if test="userDto.cityId != null and userDto.cityId != ''">
                 and tu.city_id = #{userDto.cityId}
             </if>
-            /* 区 */
             <if test="userDto.districtId != null and userDto.districtId != ''">
                 and tu.district_id = #{userDto.districtId}
             </if>
-            /* 手机号 */
             <if test="userDto.mobile != null and userDto.mobile != ''">
                 and tu.mobile = #{userDto.mobile}
             </if>
-            /* 开户状态 */
             <if test="userDto.accountStatus != null and userDto.accountStatus != ''">
                 and tu.account_status = #{userDto.accountStatus}
             </if>
-            /* 输入客户名称 */
             <if test="userDto.keyWord != null and userDto.keyWord != ''">
                 and tu.company_name like concat('%',#{userDto.keyWord},'%')
             </if>
@@ -49,7 +41,7 @@
         select tu.*,
         tr.name as provinceName,
         tr1.name as cityName,
-        tr2.name as districtName
+        tr2.name as districtName,
         tul.level_name as userLevelName
         from t_user tu
         left join t_region tr on tu.province_id = tr.id
@@ -71,11 +63,11 @@
     </select>
     <!--查询所有数据-->
     <select id="listAll" parameterType="String" resultType="cn.jdcloud.medicine.mall.domain.user.UserExcel">
-        select tu.*, tr.name
-        as provinceId, tr1.name
-        as cityId, tr2.name
-        as districtId, tul.level_name
-        as userLevelId
+        select tu.*,
+        tr.name as provinceId,
+        tr1.name as cityId,
+        tr2.name as districtId,
+        tul.level_name as userLevelId
         from t_user tu
         left join t_region tr on tu.province_id = tr.id
         left join t_region tr1 on tu.city_id = tr1.id
