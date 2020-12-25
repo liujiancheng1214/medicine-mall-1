@@ -34,6 +34,7 @@ import cn.jdcloud.medicine.mall.api.biz.admin.code.AdminCode;
 import cn.jdcloud.medicine.mall.api.biz.coupon.service.CouponRecordService;
 import cn.jdcloud.medicine.mall.api.biz.coupon.vo.CouponVo;
 import cn.jdcloud.medicine.mall.api.biz.coupon.vo.ItemNumVo;
+import cn.jdcloud.medicine.mall.api.biz.integral.service.IntegralService;
 import cn.jdcloud.medicine.mall.api.biz.order.code.OrderCode;
 import cn.jdcloud.medicine.mall.api.biz.order.dto.CreateOrderDto;
 import cn.jdcloud.medicine.mall.api.biz.order.dto.CreateOrderItemDto;
@@ -53,6 +54,7 @@ import cn.jdcloud.medicine.mall.api.biz.product.service.ItemBatchService;
 import cn.jdcloud.medicine.mall.api.biz.product.service.ItemService;
 import cn.jdcloud.medicine.mall.api.biz.promotion.code.PromotionCode;
 import cn.jdcloud.medicine.mall.api.biz.promotion.service.GroupInfoService;
+import cn.jdcloud.medicine.mall.api.biz.promotion.service.GroupUserService;
 import cn.jdcloud.medicine.mall.api.biz.promotion.service.PromotionGroupItemService;
 import cn.jdcloud.medicine.mall.api.common.utils.BeanUtil;
 import cn.jdcloud.medicine.mall.api.common.utils.MyExcelUtil;
@@ -61,6 +63,8 @@ import cn.jdcloud.medicine.mall.dao.coupon.CouponRecordMapper;
 import cn.jdcloud.medicine.mall.dao.coupon.OrderCouponMapper;
 import cn.jdcloud.medicine.mall.dao.order.OrderInfoMapper;
 import cn.jdcloud.medicine.mall.dao.order.OrderMapper;
+import cn.jdcloud.medicine.mall.dao.product.CarMapper;
+import cn.jdcloud.medicine.mall.dao.product.ItemBatchMapper;
 import cn.jdcloud.medicine.mall.dao.product.ItemMapper;
 import cn.jdcloud.medicine.mall.dao.promotion.GroupInfoMapper;
 import cn.jdcloud.medicine.mall.dao.promotion.GroupUserMapper;
@@ -71,11 +75,13 @@ import cn.jdcloud.medicine.mall.dao.user.UserAddressMapper;
 import cn.jdcloud.medicine.mall.dao.user.UserMapper;
 import cn.jdcloud.medicine.mall.domain.coupon.CouponRecord;
 import cn.jdcloud.medicine.mall.domain.coupon.OrderCoupon;
+import cn.jdcloud.medicine.mall.domain.integral.Integral;
 import cn.jdcloud.medicine.mall.domain.order.Order;
 import cn.jdcloud.medicine.mall.domain.order.OrderInfo;
 import cn.jdcloud.medicine.mall.domain.order.OrderStatusLog;
 import cn.jdcloud.medicine.mall.domain.order.vo.OrderInfoVO;
 import cn.jdcloud.medicine.mall.domain.order.vo.OrderTabCountVo;
+import cn.jdcloud.medicine.mall.domain.product.Car;
 import cn.jdcloud.medicine.mall.domain.product.Item;
 import cn.jdcloud.medicine.mall.domain.product.ItemBatch;
 import cn.jdcloud.medicine.mall.domain.promotion.GroupInfo;
@@ -83,7 +89,6 @@ import cn.jdcloud.medicine.mall.domain.promotion.GroupUser;
 import cn.jdcloud.medicine.mall.domain.promotion.PromotionGroup;
 import cn.jdcloud.medicine.mall.domain.promotion.PromotionGroupItem;
 import cn.jdcloud.medicine.mall.domain.promotion.PromotionInfo;
-import cn.jdcloud.medicine.mall.domain.promotion.PromotionItem;
 import cn.jdcloud.medicine.mall.domain.user.User;
 import cn.jdcloud.medicine.mall.domain.user.UserAddress;
 
@@ -104,7 +109,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Resource
     OrderInfoMapper orderInfoMapper;
     @Resource
-    private GroupInfoService groupInfoService;
+    CarMapper carMapper;
+    @Resource
+    GroupInfoService groupInfoService;
+    @Resource
+    GroupUserService  groupUserService;
     @Resource
     OrderService orderService;
     @Resource
@@ -113,6 +122,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     OrderStatusLogService orderStatusLogService;
     @Resource
     ItemBatchService itemBatchService;
+    @Resource
+    ItemBatchMapper itemBatchMapper;
+    
     @Resource
     CouponRecordService couponRecordService;
     @Resource
@@ -133,6 +145,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     GroupInfoMapper  groupInfoMapper;
     @Resource
     GroupUserMapper groupUserMapper;
+    @Resource
+    IntegralService integralService;
 	@Autowired
 	private PromotionGroupItemService promotionGroupItemService;
 
@@ -148,9 +162,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     	checkPromotion(promotionId);
     	PromotionGroupItem promotionGroupItem=getPromotionGroupItemByPromotionId(promotionId);
     	String itemNo=promotionGroupItem.getItemNo();
-    	Integer itemNum=promotionGroupItem.getItemNum()*createOrderDto.getNum();
+    	Integer itemNum=promotionGroupItem.getItemNum() * createOrderDto.getNum();
     	BigDecimal itemGroupPrice=promotionGroupItem.getItemGroupPrice();
-    	ItemBatch itemBatch=itemBatchService.queryItemBatchBySkuAndItemNo(promotionGroupItem.getSku(), itemNo);
+    	// ItemBatch itemBatch=itemBatchService.queryItemBatchBySkuAndItemNo(promotionGroupItem.getSku(), itemNo);
     	Item item= itemService.queryItemByItemNo(itemNo);
         String orderId = OrderUtil.randomOrderId();
         // 订单项处理
@@ -161,8 +175,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         of.setUserId(userId);
         of.setItemId(item.getId());
         of.setItemName(item.getItemName());
-        of.setSku(itemBatch.getSku());
-        of.setItemBatchNo(itemBatch.getBatchNo());
+        //of.setSku(itemBatch.getSku());
+        //of.setItemBatchNo(itemBatch.getBatchNo());
         of.setItemIcon(item.getImgCover());
         of.setItemNum(itemNum);
         of.setItemPrice(itemGroupPrice);
@@ -173,10 +187,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         //订单处理
         Order order = new Order();
         order.setOrderId(orderId);
+        order.setPromotionId(promotionId);
         order.setOrderType(createOrderDto.getOrderType());
         order.setUserId(userId);
         order.setUserName(buyer.getCompanyName());
-        order.setTotalNum(1);
+        order.setTotalNum(itemNum);
         order.setOrderStatus(Order.STATUS_DFK);
         order.setUserRemark(createOrderDto.getRemark());
         order.setCreateTime(now);
@@ -186,7 +201,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         dealOrderAddress(order,createOrderDto.getAddreddId());
         //相关费用处理
         order.setDiscountAmount(BigDecimal.ZERO);
-        order.setTransportFee(new BigDecimal(10));
+        order.setTransportFee(new BigDecimal(0));
         // 总费用就是商品价格加上运费
         order.setTotalAmount(of.getTotalPrice().add(order.getTransportFee()));
         order.setPaymentAmount(order.getTotalAmount());
@@ -196,12 +211,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 //	    PromotionItem promotionItem=promotionGroupItemService.promotionItemOne(promotionId, itemNo);
 //		PromotionInfo promotionInfo=promotionInfoMapper.selectById(promotionId);
 		GroupInfo groupInfo=groupInfoService.queryGroupInfoByPromotionId(promotionId);
-		// 该数量为表中配置的单份份额
-		groupInfo.setItemNum(groupInfo.getItemNum()+itemNum);
-		// 拼团状态 待支付
-		groupInfo.setUserNum(groupInfo.getUserNum()+1);
-		groupInfo.setUpdateTime(now);
-		groupInfoMapper.updateById(groupInfo);
 		// 拼团用户关系表
 		GroupUser groupUser=new GroupUser();
 		groupUser.setId(0);
@@ -211,8 +220,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 		groupUser.setUserId(userId);
 		groupUser.setOrderId(orderId);
 		groupUserMapper.insert(groupUser);
-
-
     	return orderId;
     }
 
@@ -246,7 +253,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     		//  活动已结束
     		throw new ApiException(PromotionCode.PROMOTION_FINISHED);
     	}
-    	PromotionGroup promotionGroup= promotionGroupMapper.selectById(promotionInfo.getPromotionGroupId());
+    	PromotionGroup promotionGroup= promotionGroupMapper.selectById(promotionInfo.getRuleId());
     	// 状态是否可用
     	Integer groupStatus=promotionGroup.getGroupStatus();
     	if(1!=groupStatus) {
@@ -298,6 +305,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 用于进行优惠券相关处理
         List<ItemNumVo> itemNumList =new ArrayList<>();
         for (CreateOrderItemDto cto:list) {
+        	// 如果购物车参数不为空 则删除购物车
+        	Integer carId=cto.getCarId();
+        	if(carId!=null) {
+        		Car car=carMapper.selectById(carId);
+        		if(car!=null) {
+        			car.setIsDelete(1);
+        			car.setUpdateTime(new Date());
+        			carMapper.updateById(car);
+        		}
+        	}
             Item p = itemMapper.selectById(cto.getItemId());
             //已删除或者已下架的商品
             if(p==null || p.getIsDeleted()== Constants.COMMON_IS || p.getState() == 1){
@@ -650,13 +667,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 		page.setCurrent(pageNum);
 		page.setSize(pageSize);
 		QueryWrapper<Order> queryWrapper =new QueryWrapper<Order>();
-		queryWrapper.eq("user_id", userId);
-		if(orderState!=null) {
-			queryWrapper.eq("order_status", orderState);
-		}
-		if(orderId!=null) {
-			queryWrapper.eq("order_id", orderId);
-		}
+		queryWrapper.eq(userId!=null,"user_id", userId);
+		queryWrapper.eq(orderState!=null,"order_status", orderState);
+		queryWrapper.eq(orderId!=null,"order_id", orderId);
+		queryWrapper.orderByDesc("create_time");
 		page=orderMapper.selectPage(page, queryWrapper);
 		List<Order> orderList=page.getRecords();
 		for(Order order:orderList) {
@@ -724,6 +738,108 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 			//  TODO  根据不同的订单状态需要做不同的处理 比如 修改为已支付状态时需要更新一堆数据
 		}
 		return null;
+	}
+
+	
+	/**
+	 * 支付后进行更新操作
+	 */
+	@Override
+	@Transactional
+	public void afterPayUpdate(String orderId) {
+		// 获得订单信息
+		OrderListVo  orderInfo=null;
+		Integer userId=null;
+		List<OrderListVo> list=this.pageOrderList(1, 1, null,orderId, null);
+		if(list.size()>0) {
+			orderInfo=list.get(0);
+		}
+		else {
+			return;
+		}
+		 /**
+		  * 1、更新订单状态
+		  * 2、更新库存、已售
+		  * 3、如果是促销活动订单 则需要更新对应的数据:
+		  * 
+		  *   GroupInfo：参团人数userNum 购买数量itemNum  判断团购状态status
+		  *   GroupUser：支付状态isPay
+		  *   PromotionInfo：返佣（暂时不做） 
+		  * 
+		  * 4、更新用户积分
+		  */
+		
+		// 更新订单状态
+		Order order=orderMapper.selectById(orderId);
+		userId=order.getUserId();
+		order.setOrderStatus(Order.STATUS_YFK_DCL);
+		order.setPayTime(new Date());
+		orderMapper.updateById(order);
+		
+		// 更新商品库存 已售
+		List<OrderItemListVo> itemList=orderInfo.getItemList();
+		for(OrderItemListVo itemVo:itemList) {
+			//  商品Item 需要更新字段 
+			//**  最后一次销售时间：lastSaleTime 库存数量：qty 总销售次数： subtotalSaleTimes 总销售数量：subtotalSaleNum*/
+			Integer itemId=itemVo.getItemId();
+			Item  item=itemMapper.selectById(itemId);
+			item.setLastSaleTime(new Date());
+			item.setQty(item.getQty().intValue()-itemVo.getItemNum()<=0 ? BigDecimal.ZERO : item.getQty().subtract(new BigDecimal(itemVo.getItemNum())));
+			item.setSubtotalPurTimes(item.getSubtotalSaleTimes()+1);
+			item.setSubtotalSaleNum(item.getSubtotalSaleNum()+itemVo.getItemNum());
+			itemMapper.updateById(item);
+			// 更新商品规格 库存数据 
+			ItemBatch  itemBatch=itemBatchService.queryItemBatchBySkuAndItemNo(itemVo.getSku(), itemVo.getItemNo());
+			itemBatch.setQty(itemBatch.getQty().intValue()-itemVo.getItemNum()<=0?BigDecimal.ZERO:itemBatch.getQty().subtract(new BigDecimal(itemVo.getItemNum())));
+			itemBatchMapper.updateById(itemBatch);
+			
+			// 更新用户积分
+			Integer integral=item.getIntegral();
+			if(integral>0) {
+				integralService.obtainIntegral(userId, Integral.INTEGRAL_TYPE_BUY_ITEM, itemId);
+			}
+			/**
+			 * 1、更新订单状态
+			 * 2、更新库存、已售
+			 * 3、如果是促销活动订单 则需要更新对应的数据:
+			 * 
+			 *   GroupInfo：参团人数userNum 购买数量itemNum  判断团购状态status
+			 *   GroupUser：支付状态isPay
+			 *   PromotionInfo：返佣（暂时不做） 
+			 */
+			
+			Integer promotionId=order.getPromotionId();
+			if(order.getOrderType()==1 && promotionId!=null) {
+				GroupInfo  groupInfo=groupInfoService.queryGroupInfoByPromotionId(promotionId);
+				groupInfo.setUserNum(groupInfo.getUserNum()+1);
+				groupInfo.setItemNum(groupInfo.getItemNum()+order.getTotalNum());
+				// 判断是否成团
+				PromotionInfo  promotionInfo=promotionInfoMapper.selectById(promotionId);
+				PromotionGroup  promotionGroup=promotionGroupMapper.selectById(promotionInfo.getRuleId());
+				//成团条件（1:按参团人数;2:按成交数量）
+				Integer condition=promotionGroup.getGroupCondition();
+				// 最低成团数量
+				Integer minSuccessNum=promotionGroup.getMinSuccessNum();
+				if(1==condition) {
+					// 拼团成功
+					if(groupInfo.getUserNum()>=minSuccessNum) {
+						groupInfo.setStatus(2);
+					}
+				}
+				else if(2==condition) {
+					// 拼团成功
+					if(groupInfo.getItemNum()>=minSuccessNum) {
+						groupInfo.setStatus(2);
+					}
+				}
+				// 更新groupInfo
+				groupInfoMapper.updateById(groupInfo);
+				GroupUser  groupUser=groupUserService.queryGroupUserByUserIdAndOrderId(userId,orderId);
+				groupUser.setIsPay(3);
+				groupUserMapper.updateById(groupUser);
+			}
+		}
+		     
 	}
 
 

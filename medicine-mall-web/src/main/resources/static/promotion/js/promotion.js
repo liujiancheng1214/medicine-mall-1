@@ -522,6 +522,7 @@ window.vm = new Vue({
         changeTemp() {
             this.temp++
         },
+        
         showPromotionInfo(info) {
             api.get('/cms/promotion/getRuleAndItem', {
                 params: {

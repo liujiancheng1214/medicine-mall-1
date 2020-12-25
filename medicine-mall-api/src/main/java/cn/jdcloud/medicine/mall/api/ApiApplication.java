@@ -23,7 +23,9 @@ import java.util.TimeZone;
 @RestController
 @EnableRedisHttpSession
 public class ApiApplication extends SpringBootServletInitializer {
-
+	// redis-server redis.windows.conf
+		// 093738177498 094710177498
+	// natapp -authtoken=e64c07b973cd3b0f
 	public static void main(String[] args) {
 		Locale.setDefault(Locale.CHINA);
 		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));

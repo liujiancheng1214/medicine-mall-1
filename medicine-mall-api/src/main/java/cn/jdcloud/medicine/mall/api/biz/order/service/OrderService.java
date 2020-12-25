@@ -27,6 +27,13 @@ import javax.servlet.http.HttpServletResponse;
 public interface OrderService extends IService<Order> {
 
 
+	/**
+	 * 支付后进行更新操作
+	 * @param orderId
+	 */
+	void afterPayUpdate(String orderId);
+	
+	
 	String updateOrderStatus(Integer userId,String orderId,byte orderStatus);
 
 	List<OrderListVo> pageOrderList(int pageNum,int pageSize,Integer userId,String orderId,Byte orderState);

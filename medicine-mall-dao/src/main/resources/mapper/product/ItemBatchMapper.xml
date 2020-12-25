@@ -9,10 +9,13 @@
         batch_no,
         produced_time,
         price,
-        qty
+        sku,
+        qty,
+        is_del
         )values
         <foreach collection="list" item="itemBatch" separator=",">
-            (#{itemBatch.itemNo},#{itemBatch.batchNo},#{itemBatch.producedTime},#{itemBatch.price},#{itemBatch.qty})
+            (#{itemBatch.itemNo},#{itemBatch.batchNo},#{itemBatch.producedTime},
+            #{itemBatch.price},#{itemBatch.sku},#{itemBatch.qty},#{itemBatch.isDel})
         </foreach>
     </insert>
 </mapper>

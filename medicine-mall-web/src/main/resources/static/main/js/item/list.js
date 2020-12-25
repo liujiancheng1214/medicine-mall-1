@@ -76,6 +76,13 @@ window.vm = new Vue({
                 outTax: "",
                 stopBuy: "",
                 businessModel: "",
+                productionDate:"",
+                indications:"",
+                components:"",
+                dosage:"",
+                adverseReactions:"",
+                attention: "",
+                taboo: "",
                 itemBatch: []
             }
         }
@@ -247,6 +254,13 @@ window.vm = new Vue({
         edit() {
             this.showEdit = true;
             this.newItem = {
+	    	    productionDate:this.editItem.productionDate,
+	            indications:this.editItem.indications,
+	            components:this.editItem.components,
+	            dosage:this.editItem.dosage,
+	            adverseReactions:this.editItem.adverseReactions,
+	            attention:this.editItem.attention,
+	            taboo: this.editItem.taboo,
                 id: this.editItem.id,
                 imgCover: this.editItem.imgCover,
                 imgFront: this.editItem.imgFront,

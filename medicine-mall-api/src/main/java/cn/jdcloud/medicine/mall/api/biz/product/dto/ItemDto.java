@@ -1,12 +1,12 @@
 package cn.jdcloud.medicine.mall.api.biz.product.dto;
 
-import cn.jdcloud.medicine.mall.domain.product.Item;
-import cn.jdcloud.medicine.mall.domain.product.ItemBatch;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+
+import cn.jdcloud.medicine.mall.domain.product.Item;
+import cn.jdcloud.medicine.mall.domain.product.ItemBatch;
+import lombok.Data;
 
 @Data
 public class ItemDto {
@@ -124,6 +124,10 @@ public class ItemDto {
      * 有效期（月）
      */
     private Integer expiryDate;
+    
+    /**生产日期 */
+    private Date productionDate;
+    
     /**
      * 经营方式(1.直营;2.联营)
      */
@@ -192,12 +196,30 @@ public class ItemDto {
      * 库存数量
      */
     private BigDecimal qty;
+    
+    
+    // 功能主治
+    private String indications;
+    // 主要成分
+    private String components;
+    // 用法用量
+    private String dosage;
+    // 不良反应
+    private  String adverseReactions;
+    // 注意事项
+    private String attention;
+    // 禁忌
+    private  String taboo;
+    
+    /**平台价格*/
+    private BigDecimal platformPrice;
 
     private List<ItemBatch> itemBatch;
 
     public Item wrapItem() {
         Item item = new Item();
         item.setId(this.id);
+        item.setPlatformPrice(this.platformPrice);
         item.setItemNo(this.itemNo);
         item.setItemName(this.itemName);
         item.setHelpCode(this.helpCode);
@@ -243,6 +265,29 @@ public class ItemDto {
         item.setImgFront(this.imgFront);
         item.setImgReverse(this.imgReverse);
         item.setQty(this.qty);
+        item.setProductionDate(this.productionDate);
+        item.setIndications(this.indications);
+        item.setComponents(this.components);
+        item.setDosage(this.dosage);
+        item.setAdverseReactions(this.adverseReactions);
+        item.setAttention(this.attention);
+        item.setTaboo(this.taboo);
+        // 有效期计算
+        // 有效日期  生产日期+有效月
+        item.setEffectiveDate(addMount(this.productionDate,this.expiryDate));
         return item;
     }
+    
+    
+    private Date addMount(Date  d,int  mount) {
+    	Date  date=new Date();
+    	date.setYear(d.getYear());
+    	date.setMonth(d.getMonth()+mount);
+    	date.setDate(d.getDate());
+    	return date;
+    }
+   
+    
+    
+    
 }

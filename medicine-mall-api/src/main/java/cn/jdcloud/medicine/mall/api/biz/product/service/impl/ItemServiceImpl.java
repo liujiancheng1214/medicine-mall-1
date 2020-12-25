@@ -187,8 +187,10 @@ public class ItemServiceImpl extends ServiceImpl<ItemMapper, Item> implements It
         String itemNo = item.getItemNo();
         BigDecimal qty = BigDecimal.ZERO;
         List<String> batchNos = new ArrayList<>();
+        // 设置SKU 
         for (ItemBatch batch : itemBatch) {
             batch.setItemNo(itemNo);
+            batch.setIsDel((byte)0);
             qty = qty.add(batch.getQty());
             String batchNo = batch.getBatchNo();
             if (batchNos.contains(batchNo)) {
@@ -214,8 +216,26 @@ public class ItemServiceImpl extends ServiceImpl<ItemMapper, Item> implements It
         item.setQty(qty);
         boolean saveOrUpdate = this.saveOrUpdate(item);
         if (saveOrUpdate) {
-            itemBatchService.remove(new QueryWrapper<ItemBatch>().eq("item_no", itemNo));
-            itemBatchService.insertBatch(itemBatch);
+        	ItemBatch  itemBatch2=new ItemBatch();
+        	itemBatch2.setIsDel((byte)1);
+        	QueryWrapper<ItemBatch> queryWrapper= new QueryWrapper<ItemBatch>().eq("item_no", itemNo).eq("is_del", 0);
+        	List<ItemBatch>  batchList=itemBatchService.list(queryWrapper);
+        	//  如果批次号没变 则需要用数据库之前的SKU把之前的
+        	for(ItemBatch ib:itemBatch) {
+        		for(ItemBatch dbIb:batchList) {
+        			if(ib.getBatchNo().equals(dbIb.getBatchNo())) {
+        				ib.setSku(dbIb.getSku());
+        				break;
+        			}
+        		}
+        		if(ib.getSku()==null||"".equals(ib.getSku())) {
+        			ib.setSku(ib.generateSKU());
+        		}
+        	}
+        	// 把之前的删除
+        	itemBatchService.update(itemBatch2,queryWrapper );
+        	// 新增
+        	itemBatchService.insertBatch(itemBatch);
         }
         return saveOrUpdate;
     }
@@ -350,10 +370,12 @@ public class ItemServiceImpl extends ServiceImpl<ItemMapper, Item> implements It
 		 vo.setStatus(changeStatus(promotionInfoDto.getStatus()));
 		// groupCondition 成团条件（1:按参团人数;2:按成交数量）
 		 if(promotionInfoDto.getGroupCondition()==1) {
-			 vo.setSuccessDesc(promotionInfoDto.getMinSuccessNum()+"人成团");
+			 vo.setSuccessDesc("人成团");
+			 vo.setSuccessNum(promotionInfoDto.getMinSuccessNum());
 		 }
 		 else {
-			 vo.setSuccessDesc(promotionInfoDto.getMinSuccessNum()+itemVo.getUnit()+"成团");
+			 vo.setSuccessNum(promotionInfoDto.getMinSuccessNum());
+			 vo.setSuccessDesc(itemVo.getUnit()+"成团");
 		 }
 		 vo.setSurplusTime((promotionInfoDto.getEndTime().getTime()-System.currentTimeMillis())/1000);
 		 List<PromotionItemUserVo> userList= promotionGroupItemService.listPromotionItemUser(promotionId);

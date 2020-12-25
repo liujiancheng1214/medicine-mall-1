@@ -14,7 +14,7 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
-    password:
+    password: 123
     database: 0
     timeout: 3000ms
     # 连接池配置，2.0中直接使用jedis或者lettuce配置连接池
@@ -51,13 +51,15 @@ spring:
 
 web:
   api:
-    url: http://localhost:8089
-  upload:
-    url: http://192.168.3.169:8099/file
-  base:
     url: http://localhost:8088
+  upload:
+    url: http://192.168.3.169:8088/file
+  base:
+    #url: http://localhost:7070
+     url: http://qe92ci.natappfree.cc
   static:
-    url: http://localhost:8088/static
+    # url: http://localhost:7070/static
+      url: http://qe92ci.natappfree.cc/static
   version: 1.0.0
   platform:
     name: 医药商城管理后台

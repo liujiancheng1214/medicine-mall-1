@@ -61,7 +61,7 @@ public class PromotionInfoServiceImpl extends ServiceImpl<PromotionInfoMapper, P
         if(saveOrUpdate){
             Integer promotionId = promotionInfo.getPromotionId();
             List<PromotionItemDto> promotionItems = promotionDto.getItems();
-            if (promotionInfo.getPromotionType().equals(1)){
+            if (promotionInfo.getPromotionType()==1){
                 promotionGroupItemService.updateByPromotionId(promotionItems,promotionId);
             }
         }

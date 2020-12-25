@@ -15,4 +15,5 @@ public class CreateOrderItemDto {
     private String sku;
     @ApiModelProperty(value="商品批次号")
     private String itemBatchNo;
+    private Integer carId;
 }

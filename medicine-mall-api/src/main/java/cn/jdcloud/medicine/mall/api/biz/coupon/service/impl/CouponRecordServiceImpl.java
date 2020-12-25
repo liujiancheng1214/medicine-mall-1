@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -289,5 +290,15 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
 	public int queryCouponNum(Integer userId) {
 		return couponRecordMapper.selectCount(new QueryWrapper<CouponRecord>()
 				.eq("user_id", userId).eq("coupon_status", 1));
+	}
+
+	@Override
+	public List<Integer> userCouponRecordIds(Integer userId) {
+		List<CouponRecord> list=couponRecordMapper.selectList(new QueryWrapper<CouponRecord>()
+				.eq("user_id", userId));
+		if(list.size()>0) {
+			return list.stream().map(bean->bean.getCouponId()).collect(Collectors.toList());
+		}
+		return null;
 	}
 }

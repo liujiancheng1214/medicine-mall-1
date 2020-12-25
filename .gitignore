@@ -20,7 +20,7 @@
 /**/out/
 /**/logs/
 /logs/
-
+bin
 
 ### NetBeans ###
 /nbproject/private/
@@ -28,3 +28,6 @@
 /dist/
 /nbdist/
 /.nb-gradle/
+.gitignore
+.gradle
+.yml

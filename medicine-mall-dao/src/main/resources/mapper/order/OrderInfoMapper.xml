@@ -28,7 +28,7 @@
          b.approval_no_end_at effectiveDate ,
          b.item_brand_id brandId,
          (select ibrand_name from t_item_brand where id=b.item_brand_id) brandName  ,
-         a.item_price itemPrice,
+         a.item_price platformPrice,
          a.item_num itemNum ,
          b.img_cover imgCover,
          c.order_status orderStatus,

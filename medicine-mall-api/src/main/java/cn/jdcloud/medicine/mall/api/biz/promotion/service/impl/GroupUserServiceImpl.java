@@ -1,14 +1,19 @@
 package cn.jdcloud.medicine.mall.api.biz.promotion.service.impl;
 
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
 import cn.jdcloud.medicine.mall.api.biz.promotion.service.GroupUserService;
 import cn.jdcloud.medicine.mall.dao.promotion.GroupUserMapper;
 import cn.jdcloud.medicine.mall.domain.promotion.GroupUser;
 import cn.jdcloud.medicine.mall.domain.promotion.GroupUserResult;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * @author chenQF
@@ -27,5 +32,15 @@ public class GroupUserServiceImpl extends ServiceImpl<GroupUserMapper, GroupUser
         page.setTotal(groupUserMapper.listCount(groupId));
         return page;
     }
+
+	@Override
+	public GroupUser queryGroupUserByUserIdAndOrderId(Integer userId, String orderId) {
+		List<GroupUser> list= groupUserMapper.selectList(new QueryWrapper<GroupUser>()
+				.eq("user_id", userId).eq("order_id", orderId));
+		if(list.size()>0) {
+			return list.get(0);
+		}
+		return null;
+	}
 
 }

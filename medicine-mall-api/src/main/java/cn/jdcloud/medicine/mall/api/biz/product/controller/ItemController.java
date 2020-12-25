@@ -169,7 +169,7 @@ public class ItemController {
     @ApiOperation(value = "获取商品批次信息")
     @GetMapping(value = "/getItemBatches")
     public ApiResult getItemBatchList(String no) {
-        List<ItemBatch> list = itemBatchService.list(new QueryWrapper<ItemBatch>().eq("item_no", no));
+        List<ItemBatch> list = itemBatchService.list(new QueryWrapper<ItemBatch>().eq("item_no", no).eq("is_del", 0));
         return ApiResult.ok(list);
     }
 

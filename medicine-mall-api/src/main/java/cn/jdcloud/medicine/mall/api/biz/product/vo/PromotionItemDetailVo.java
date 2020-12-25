@@ -19,6 +19,9 @@ public class PromotionItemDetailVo {
 	private long surplusTime;
 	@ApiModelProperty("成团数量")
 	private String successDesc;
+	
+	@ApiModelProperty("成团数量")
+	private Integer successNum;
 	@ApiModelProperty("商品对应的推荐信息")
 	private List<ItemVo> recommendList;
 	private List<PromotionItemUserVo> userList;

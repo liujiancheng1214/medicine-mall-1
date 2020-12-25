@@ -18,7 +18,7 @@
 	        c.item_num itemNum,c.user_num userNum,
 	        a.promotion_id promotionId
         from  t_promotion_info a,t_promotion_group b ,t_group_info c
-        where b.id=a.promotion_group_id and a.promotion_id=c.promotion_id
+        where b.id=a.rule_id and a.promotion_id=c.promotion_id
         and a.promotion_id=#{promotionId}
     
     

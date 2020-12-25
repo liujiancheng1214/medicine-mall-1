@@ -1,9 +1,12 @@
 package cn.jdcloud.medicine.mall.api.biz.promotion.service;
 
-import cn.jdcloud.medicine.mall.domain.promotion.GroupUser;
-import cn.jdcloud.medicine.mall.domain.promotion.GroupUserResult;
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import cn.jdcloud.medicine.mall.domain.promotion.GroupUser;
+import cn.jdcloud.medicine.mall.domain.promotion.GroupUserResult;
 
 /**
  * @author chenQF
@@ -18,5 +21,9 @@ public interface GroupUserService extends IService<GroupUser> {
      * @return
      */
     Page<GroupUserResult> listGroupUser(Page<GroupUserResult> page, String groupId);
+    
+   
+    
+    GroupUser queryGroupUserByUserIdAndOrderId(Integer userId,String orderId);
 
 }

@@ -308,6 +308,12 @@
                     <i-input style="width: 500px" type="number"
                              v-model="newItem.mediumPackage"></i-input>
                 </Form-item>
+                
+                 <Form-item label="生产日期" prop="productionDate">
+                  <Date-picker type="date" v-model="newItem.productionDate"
+                                         style="width: 320px"></Date-picker>
+                </Form-item>
+                
                 <Form-item label="有效期（月）" prop="expiryDate">
                     <i-input style="width: 500px" number v-model="newItem.expiryDate"></i-input>
                 </Form-item>
@@ -343,10 +349,35 @@
                     <i-input type="textarea" :rows="3" style="width: 500px"
                              v-model="newItem.forPeople"></i-input>
                 </Form-item>
-                <Form-item label="销售策略" prop="saleStrategy">
+                <Form-item label="功能主治" prop="indications">
                     <i-input type="textarea" :rows="3" style="width: 500px"
-                             v-model="newItem.saleStrategy"></i-input>
+                             v-model="newItem.indications"></i-input>
                 </Form-item>
+                
+                 <Form-item label="主要成功" prop="components">
+                    <i-input type="textarea" :rows="3" style="width: 500px"
+                             v-model="newItem.components"></i-input>
+                </Form-item>
+                
+                 <Form-item label="用法用量" prop="dosage">
+                    <i-input type="textarea" :rows="3" style="width: 500px"
+                             v-model="newItem.dosage"></i-input>
+                </Form-item>
+                 <Form-item label="不良反应" prop="adverseReactions">
+                    <i-input type="textarea" :rows="3" style="width: 500px"
+                             v-model="newItem.adverseReactions"></i-input>
+                </Form-item>
+                
+                 <Form-item label="注意事项" prop="attention">
+                    <i-input type="textarea" :rows="3" style="width: 500px"
+                             v-model="newItem.attention"></i-input>
+                </Form-item>
+                
+                 <Form-item label="禁忌" prop="taboo">
+                    <i-input type="textarea" :rows="3" style="width: 500px"
+                             v-model="newItem.taboo"></i-input>
+                </Form-item>
+                
                 <Row>
                     <i-col span="6">
                         <Form-item label="重点商品" prop="important">

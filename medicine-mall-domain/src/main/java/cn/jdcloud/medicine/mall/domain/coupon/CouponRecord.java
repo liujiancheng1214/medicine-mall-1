@@ -29,7 +29,7 @@ public class CouponRecord {
 
     private Date expireTime; //过期时间
 
-    private Date usedAt; //使用时间
+    private Date usedTime; //使用时间
 
     private Byte couponStatus; //券状态(1为可用;2:为已过期;3:已核销)
 }

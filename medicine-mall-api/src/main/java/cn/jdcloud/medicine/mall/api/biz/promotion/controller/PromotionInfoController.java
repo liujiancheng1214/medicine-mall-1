@@ -148,10 +148,10 @@ public class PromotionInfoController {
     public ApiResult ongoingActivities() {
         Date date = new Date();
         String now = new SimpleDateFormat("yyyy-MM-dd").format(date);
-        QueryWrapper<PromotionInfo> wrapper = new QueryWrapper<PromotionInfo>()
-                .eq("audit_status",1).eq("is_deleted",0)
-                .gt("end_time", now)
-                .lt("begin_time",now);
+        QueryWrapper<PromotionInfo> wrapper = new QueryWrapper<PromotionInfo>();
+        		wrapper.eq("audit_status",1).eq("is_deleted",0);
+        		wrapper.and(wrapper2 -> wrapper2.gt("end_time", now).or().eq("end_time", now));
+        		wrapper.and(wrapper2 -> wrapper2.lt("begin_time", now).or().eq("begin_time", now));
         List<PromotionInfo> list = promotionInfoService.list(wrapper);
         return ApiResult.ok(list);
     }

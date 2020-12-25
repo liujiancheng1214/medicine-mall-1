@@ -53,16 +53,9 @@ subprojects {
     }
 
     repositories {
-        maven{ url 'http://nexus.jdcloud.cn/repository/maven-public/'}
+         mavenLocal()
+         maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
     }
 
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "http://nexus.jdcloud.cn/repository/maven-snapshots/") {
-                    authentication(userName: "deploy", password: "deploy123")
-                }
-            }
-        }
-    }
+ 
 }

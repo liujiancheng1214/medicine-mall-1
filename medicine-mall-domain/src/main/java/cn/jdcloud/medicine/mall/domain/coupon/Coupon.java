@@ -20,6 +20,8 @@ public class Coupon {
     private Integer id;
 
     private String title; //优惠券标题
+    
+    private String image;  //图片
 
     private Integer budgetUseTotalQty; //使用总量
 
@@ -50,6 +52,8 @@ public class Coupon {
     private Integer expireNoticeDays; //过期前几天提示
 
     private Integer expireDays; //优惠券有效时间单位(天)
+    
+    private Date expireTime; //优惠券有效时间
 
     private Date createTime;
 
@@ -58,4 +62,6 @@ public class Coupon {
     private Integer creator;
 
     private Integer updator;
+    
+    private Integer integral; // 兑换优惠券需要积分数
 }

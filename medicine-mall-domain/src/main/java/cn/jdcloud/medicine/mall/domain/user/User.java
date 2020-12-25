@@ -48,7 +48,7 @@ public class User {
     private String contactName; //联系人名字
     private String contactPhone; //联系人手机
     
-    
+    private Integer integral;  //总积分
 
 
     private String taxNo;  //税号

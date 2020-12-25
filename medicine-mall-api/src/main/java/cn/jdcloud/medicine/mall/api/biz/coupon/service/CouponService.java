@@ -1,9 +1,11 @@
 package cn.jdcloud.medicine.mall.api.biz.coupon.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+import cn.jdcloud.medicine.mall.api.biz.product.vo.CouponVo;
 import cn.jdcloud.medicine.mall.domain.coupon.Coupon;
 import cn.jdcloud.medicine.mall.domain.coupon.CouponResult;
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * @author chenQF
@@ -11,6 +13,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * @date 2020/8/20 0020 17:43
  */
 public interface CouponService extends IService<Coupon> {
+	
+	/**
+	 * 查询用户可领取的优惠券列表
+	 * @param pageNum
+	 * @param pageSize
+	 * @param userId
+	 * @return
+	 */
+	Page<CouponVo> listCoupon(int pageNum,int pageSize,Integer userId,Byte limitType);
     /**
      * 查询优惠券类别列表
      * @param page

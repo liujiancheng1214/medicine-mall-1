@@ -333,6 +333,13 @@ public class ItemVo{
         this.lastSaleTime = item.getLastSaleTime();
         this.itemBatch = map.get(this.itemNo);
         this.platformPrice = item.getPlatformPrice();
+        this.productionDate=item.getProductionDate();
+        this.indications=item.getIndications();
+        this.components=item.getComponents();
+        this.dosage=item.getDosage();
+        this.adverseReactions=item.getAdverseReactions();
+        this.attention=item.getAttention();
+        this.taboo=item.getTaboo();
         this.erpId = item.getErpId();
     }
 }

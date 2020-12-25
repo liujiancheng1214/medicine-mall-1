@@ -15,7 +15,6 @@ public class PromotionInfo extends BaseDomain {
     @TableId(value = "promotion_id",type = IdType.AUTO)
     private Integer promotionId;
     /**模板Id*/
-    @TableField(exist = false)
     private Integer promotionGroupId;
     /**促销方案名称*/
     private String promotionName;

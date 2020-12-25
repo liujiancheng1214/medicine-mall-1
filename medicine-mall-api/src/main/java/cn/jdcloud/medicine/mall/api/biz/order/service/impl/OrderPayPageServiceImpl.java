@@ -197,6 +197,7 @@ public class OrderPayPageServiceImpl implements OrderPayPageService {
 			Item itemVo = itemService.queryItemByItemNo(car.getItemNo());
 			PageItemVo  pageItemVo=new PageItemVo();
 			BeanUtil.copyProperties(itemVo, pageItemVo);
+			pageItemVo.setCarId(car.getId());
 			pageItemVo.setNum(car.getNum());
 			pageItemVo.setFactory(itemVo.getFactory());
 			// pageItemVo.setItemBrandName(brandName(pageItemVo.getItemBrandId()));

@@ -59,6 +59,7 @@ public class PromotionDto {
         promotionInfo.setEndTime(this.endTime);
         promotionInfo.setPromotionType(this.promotionType);
         promotionInfo.setRuleId(this.ruleId);
+        promotionInfo.setPromotionGroupId(this.ruleId);
         return promotionInfo;
     }
 

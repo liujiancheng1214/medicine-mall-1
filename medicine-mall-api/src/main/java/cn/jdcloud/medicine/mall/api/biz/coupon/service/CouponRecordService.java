@@ -20,6 +20,14 @@ import cn.jdcloud.medicine.mall.domain.coupon.CouponRecordResult;
  */
 public interface CouponRecordService extends IService<CouponRecord> {
 	
+	
+	/**
+	 * 查询用户已经领取的优惠券ID
+	 * @param userId
+	 * @return
+	 */
+	List<Integer> userCouponRecordIds(Integer userId);
+	
 	/**
 	 * 查询可用优惠券数量
 	 */

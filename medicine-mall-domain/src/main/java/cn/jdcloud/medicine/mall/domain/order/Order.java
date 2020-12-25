@@ -83,6 +83,9 @@ public class Order extends BaseDomain{
     @TableId(value = "order_id",type = IdType.INPUT)
     private String orderId;
     //订单类型 0 普通订单   1 拼团订单
+    // 拼团订单的活动Id
+    private Integer promotionId;
+    
     private Byte orderType;
     //客户id
     private Integer userId;

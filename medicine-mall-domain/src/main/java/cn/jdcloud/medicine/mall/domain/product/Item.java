@@ -185,5 +185,8 @@ public class Item extends BaseDomain {
     private  String taboo;
 
     private  String erpId;
+    
+    //购买商品赠送积分
+    private Integer integral;
 
 }

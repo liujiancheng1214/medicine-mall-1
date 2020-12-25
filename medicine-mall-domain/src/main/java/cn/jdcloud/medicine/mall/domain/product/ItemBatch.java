@@ -9,6 +9,10 @@ import java.util.Date;
 @Data
 @TableName("t_item_batch")
 public class ItemBatch {
+	  //删除的
+    public static final byte DELETE = 1;
+    //未删除的
+    public static final byte UNDELETE = 0;
     private Integer id;
     /**商品编码*/
     private String itemNo;
@@ -22,4 +26,12 @@ public class ItemBatch {
     private BigDecimal qty;
     /**用于计算价格*/
     private String sku;
+    
+    private  Byte isDel;
+    
+    // SKU生成策略
+    public String generateSKU() {
+    	return itemNo+"-"+batchNo;
+    }
+    
 }
