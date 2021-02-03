@@ -66,11 +66,15 @@ public class FootprintServiceImpl extends ServiceImpl<FootprintMapper, Footprint
     }
 
     @Override
-    public int deleteFootprint(Integer userId, List<Integer> ids) {
+    public int deleteFootprint(Integer userId, List<String> itemNos) {
         List<Footprint> list = footprintMapper
-                .selectList(new QueryWrapper<Footprint>().eq("user_id", userId).in("id", ids));
+                .selectList(new QueryWrapper<Footprint>().eq("user_id", userId).in("item_no", itemNos));
         List<Integer> idList = list.stream().map(bean -> bean.getId()).collect(Collectors.toList());
-        return footprintMapper.deleteBatchIds(idList);
+       int i=0;
+       if(idList.size()>0) {
+    	   i=footprintMapper.deleteBatchIds(idList);
+       }
+        return i;
     }
 
     @Override

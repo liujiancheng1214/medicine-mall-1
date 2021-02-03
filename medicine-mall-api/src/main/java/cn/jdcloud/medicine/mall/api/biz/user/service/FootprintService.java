@@ -13,5 +13,5 @@ public interface FootprintService extends IService<Footprint> {
 
 	List<FootprintVo> listFootprint(Integer userId,int pageNum,int pageSize);
 	
-	int deleteFootprint(Integer userId,List<Integer>ids);
+	int deleteFootprint(Integer userId,List<String>itemNos);
 }

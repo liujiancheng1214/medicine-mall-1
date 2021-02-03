@@ -5,6 +5,7 @@ import cn.jdcloud.medicine.mall.domain.sige.Sign;
 
 public interface SignService {
 
+	void updateUserSignTag(Integer userId ,byte tag);
 	
 	Sign queryCurrentDaySign(Integer userId);
 	

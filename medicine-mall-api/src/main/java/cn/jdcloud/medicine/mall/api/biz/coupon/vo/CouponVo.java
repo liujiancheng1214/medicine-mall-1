@@ -29,7 +29,7 @@ public class CouponVo {
 	private String description; // 优惠券描述
 	@ApiModelProperty(value = "优惠券有效时间单位(天)")
 	private Integer expireDays; 
-	
+	@ApiModelProperty(value = "限制类型: 0 不受限制   1 商品限制  2 品牌限制 3 类别限制 ")
 	private Byte limitType; //限制类型: 0 不受限制   1 商品限制  2 品牌限制 3 类别限制 
 	    
     private String limitItenIds; //限制商品

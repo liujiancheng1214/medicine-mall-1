@@ -14,7 +14,7 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel("生成订单参数对象")
 public class CreateOrderDto {
     //0：普通订单  1：拼团订单   默认 0
-    @ApiModelProperty(value = "订单类型  0 普通订单  1 拼团订单")
+    @ApiModelProperty(value = "订单类型  0 普通订单  1 拼团订单  2 预售订单")
     private byte orderType = 0;
     @ApiModelProperty(value = "活动id")
     private Integer promotionId;

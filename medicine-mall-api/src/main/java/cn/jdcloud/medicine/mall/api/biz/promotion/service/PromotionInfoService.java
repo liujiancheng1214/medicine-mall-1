@@ -9,6 +9,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 public interface PromotionInfoService extends IService<PromotionInfo> {
+	
+	
+	
     /**
      * 促销活动列表分页
      * @param page

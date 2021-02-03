@@ -17,4 +17,12 @@ public class PromotionItemListDto {
      private BigDecimal itemGroupPrice;
      private Date effectiveDate;
      private String factory;
+     //已拼数量
+     private Integer soldNum;
+     // 已拼人数
+     private Integer soldUserNum;
+     // 起拼数量
+     private Integer limitNum;
+     //活动结束时间
+     private Date endTime;
 }

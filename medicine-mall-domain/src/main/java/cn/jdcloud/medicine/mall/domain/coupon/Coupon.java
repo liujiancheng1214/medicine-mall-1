@@ -33,7 +33,7 @@ public class Coupon {
     
     private String limitItenIds; //限制商品
     
-    private Integer limitItemNum; //只针对limitType=1 限制商品数量 默认1 当为2时,表示最少购买2件该商品才可使用
+    private Integer limitItemNum; // 限制商品数量 默认1 当为2时,表示最少购买2件该商品才可使用
 
     private BigDecimal discountAmount; //优惠金额
 

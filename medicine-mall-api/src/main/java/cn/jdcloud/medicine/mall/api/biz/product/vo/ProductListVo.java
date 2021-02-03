@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @ApiModel("商品列表")
-public class ProductListVO {
+public class ProductListVo {
 
 
     private Integer id;

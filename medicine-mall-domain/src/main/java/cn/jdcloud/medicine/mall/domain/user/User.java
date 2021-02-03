@@ -50,7 +50,7 @@ public class User {
     
     private Integer integral;  //总积分
 
-
+    private Byte signTag;// 连续签到提醒开关 0  关 1 开
     private String taxNo;  //税号
     private String invoiceType; //发票类型
     private Integer userLevelId; //用户等级id

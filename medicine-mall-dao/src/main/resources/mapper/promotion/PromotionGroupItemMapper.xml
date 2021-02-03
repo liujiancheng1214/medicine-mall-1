@@ -17,14 +17,16 @@
 
 
   <select id="listPromotionItems"  resultType="cn.jdcloud.medicine.mall.domain.promotion.PromotionItemListDto">
+    select  aa.*, ifnull(dd.item_num,0)  sold_num,  ifnull(dd.user_num,0) sold_user_num from(
       select  
-      a.promotion_id , c.id  item_id,
-      c.item_no,c.item_name,c.img_cover ,
+      a.promotion_id , c.id  item_id, 
+       a.item_num limit_num,
+      c.item_no,c.item_name,c.img_cover , b.end_time ,
       c.subtotal_sale_num, a.item_group_price,
       c.effective_date ,c.factory ,c.retail_price retail_price
     from  
       t_promotion_group_item a,t_promotion_info b,t_item  c
-    where a.promotion_id=b.promotion_id and a.item_no=c.item_no
+    where a.promotion_id=b.promotion_id and a.item_no=c.item_no 
     and b.end_time>now()  and b.status=1 and b.is_deleted=0
     <if test="promotionIds != null and promotionIds != ''">
        and  a.promotion_id in
@@ -32,31 +34,21 @@
              #{item}
      </foreach>
      </if>
-     <if test="itemNo != null and itemNo != ''">
-        and c.item_no=${itemNo}
+     <if test="itemNos != null and itemNos != ''">
+       and   c.item_no in
+        <foreach item="item" collection="itemNos" separator="," open="(" close=")" index="">
+             #{item}
+     </foreach>
      </if>
-      <if test="itemName != null and itemName != ''">
-       and  c.item_name like '%${itemName}%'
-     </if>
-       <if test="itemBrandName != null and itemBrandName != ''">
-       and  c.item_brand_id in(
-        select  id  from t_item_brand where ibrand_name like '%${itemBrandName}%' 
+     <if test="searchValue != null and searchValue != ''">
+        and
+       ( c.item_name like '%${itemName}%' or
+          c.item_brand_id in( 
+        select  id  from t_item_brand where ibrand_name like '%${itemBrandName}%')
         )
      </if>
-     <!-- 排序规则  1：价格升序 2 价格降序 3 有效期升序 4 有效期降序 -->
-       <if test="sortType != null and sortType == 1">
-          order by a.item_group_price 
-      </if>
-      <if test="sortType != null and sortType == 2">
-          order by a.item_group_price  desc 
-      </if>
-   
-    <if test="sortType != null and sortType == 3">
-          order by c.effective_date
-      </if>
-       <if test="sortType != null and sortType == 4">
-          order by c.effective_date  desc
-      </if>
+     )aa left join t_group_info dd
+      on aa.promotion_id=dd.promotion_id and aa.item_no=dd.item_no
   </select>
 
   <select id="checkItemIsPromotionItem" resultType="int">

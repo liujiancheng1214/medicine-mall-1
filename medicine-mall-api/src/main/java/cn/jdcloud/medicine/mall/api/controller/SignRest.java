@@ -1,6 +1,7 @@
 package cn.jdcloud.medicine.mall.api.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,8 +27,8 @@ public class SignRest {
 	@PostMapping(value = "/addSign")
 	public ApiResult<Integer> addSign(@RequestHeader("token") String token) {
 		Integer userId=userContextUtil.tokenToUserId(token);
-		int i=signService.addSign(userId);
-		return ApiResult.ok(i);
+		signService.addSign(userId);
+		return ApiResult.ok(1);
 	}
 
 	@ApiOperation(value = "签到信息查询")
@@ -39,6 +40,12 @@ public class SignRest {
 	}
 
 	
-
+	@ApiOperation(value = "更新签到通知开关 0 关 1 开 ,返回1 更新成功")
+	@GetMapping(value = "/updateSignTag")
+	public ApiResult<Integer> updateSignTag(@RequestHeader("token") String token,byte tag) {
+		Integer userId=userContextUtil.tokenToUserId(token);
+		signService.updateUserSignTag(userId, tag);
+		return ApiResult.ok(1);
+	}
 
 }

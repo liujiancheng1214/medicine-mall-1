@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -268,6 +268,7 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
 				record.setUserId(dto.getUserIds().get(i));
 				record.setCouponId(coupon.getId());
 				record.setCouponType(coupon.getType());
+				record.setType((byte)1);
 				record.setExpireTime(TimeUtil.dateAddDays(new Date(), coupon.getExpireDays()));
 				record.setCouponStatus((byte) 1);
 				record.setCreateTime(new Date());
@@ -294,11 +295,15 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
 
 	@Override
 	public List<Integer> userCouponRecordIds(Integer userId) {
-		List<CouponRecord> list=couponRecordMapper.selectList(new QueryWrapper<CouponRecord>()
-				.eq("user_id", userId));
-		if(list.size()>0) {
-			return list.stream().map(bean->bean.getCouponId()).collect(Collectors.toList());
+		
+		List<Integer> result=new ArrayList<>();
+		QueryWrapper<CouponRecord>  queryWrapper=new QueryWrapper<CouponRecord>();
+		queryWrapper.select(" distinct coupon_id");
+		queryWrapper.eq("user_id", userId);
+		List<Map<String, Object>> list =couponRecordMapper.selectMaps(queryWrapper);
+		for(Map<String, Object> map:list) {
+			result.add((Integer)map.get("coupon_id"));
 		}
-		return null;
+		return result;
 	}
 }

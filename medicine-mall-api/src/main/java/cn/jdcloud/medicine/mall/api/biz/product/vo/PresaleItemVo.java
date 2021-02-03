@@ -11,6 +11,10 @@ import lombok.Data;
 @Data
 public class PresaleItemVo {
 	    private int itemId;
+	    
+	    /**产品封面*/
+	    @ApiModelProperty(value="产品封面")
+	    private String imgCover;
 	    @ApiModelProperty(value="商品编码")
 	    private String itemNo;
 	    /**商品名字*/

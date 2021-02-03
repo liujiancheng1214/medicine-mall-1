@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -38,12 +39,7 @@ public class FootprintRest {
     @GetMapping(value = "/deleteFootprint")
     public ApiResult<Integer> deleteFootprint(@RequestHeader("token") String token,String ids) {
     	Integer userId=userContextUtil.tokenToUserId(token);
-        List<Integer> list = new ArrayList<>();
-        String[] str = ids.split(",");
-        for (String s : str) {
-            list.add(Integer.parseInt(s));
-        }
-        int i = footprintService.deleteFootprint(userId, list);
+        int i = footprintService.deleteFootprint(userId, Arrays.asList(ids.split(",")));
         return ApiResult.ok(i);
     }
 }

@@ -16,9 +16,8 @@ public interface PromotionGroupItemMapper extends BaseMapper<PromotionGroupItem>
 
     List<PromotionItem>  PromotionGroupItemInfo(@Param("promotionId") Integer promotionId);
     
-    List<PromotionItemListDto> listPromotionItems(@Param("itemNo")String itemNo,@Param("itemName")String itemName,
-    		@Param("itemBrandName")String itemBrandName
-    		,@Param("sortType")Integer sortType,@Param("promotionIds")List<Integer>promotionIds);
+    List<PromotionItemListDto> listPromotionItems(@Param("itemNos")List<Integer>itemNos,@Param("promotionIds")List<Integer>promotionIds,
+    	@Param("searchValue")String searchValue,@Param("sortType")Integer sortType);
     
     
     List<PromotionItemUserDto> listPromotionItemUser(@Param("promotionId") Integer promotionId);

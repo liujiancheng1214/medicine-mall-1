@@ -32,4 +32,6 @@ public class CouponRecord {
     private Date usedTime; //使用时间
 
     private Byte couponStatus; //券状态(1为可用;2:为已过期;3:已核销)
+    
+    private  Byte type; //领取类型  1 自主领取  2 分享领取 3 积分兑换领取
 }

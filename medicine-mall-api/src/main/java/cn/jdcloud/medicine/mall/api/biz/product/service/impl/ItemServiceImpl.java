@@ -2,6 +2,7 @@ package cn.jdcloud.medicine.mall.api.biz.product.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +21,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.jdcloud.medicine.mall.api.biz.admin.service.AdminService;
+import cn.jdcloud.medicine.mall.api.biz.config.ConfigService;
+import cn.jdcloud.medicine.mall.api.biz.coupon.service.CouponService;
 import cn.jdcloud.medicine.mall.api.biz.product.dto.ItemDto;
 import cn.jdcloud.medicine.mall.api.biz.product.enums.ItemBusinessEnum;
 import cn.jdcloud.medicine.mall.api.biz.product.enums.ItemImportantEnum;
@@ -27,6 +30,12 @@ import cn.jdcloud.medicine.mall.api.biz.product.enums.ItemStopBuyEnum;
 import cn.jdcloud.medicine.mall.api.biz.product.excel.ItemExcel;
 import cn.jdcloud.medicine.mall.api.biz.product.service.ItemBatchService;
 import cn.jdcloud.medicine.mall.api.biz.product.service.ItemService;
+import cn.jdcloud.medicine.mall.api.biz.product.vo.CouponVo;
+import cn.jdcloud.medicine.mall.api.biz.product.vo.FilterBrandVo;
+import cn.jdcloud.medicine.mall.api.biz.product.vo.FilterCategoryVo;
+import cn.jdcloud.medicine.mall.api.biz.product.vo.FilterVo;
+import cn.jdcloud.medicine.mall.api.biz.product.vo.IndexCouponItemVo;
+import cn.jdcloud.medicine.mall.api.biz.product.vo.IndexPromotionItemVo;
 import cn.jdcloud.medicine.mall.api.biz.product.vo.ItemBatchVo;
 import cn.jdcloud.medicine.mall.api.biz.product.vo.ItemDetailVo;
 import cn.jdcloud.medicine.mall.api.biz.product.vo.ItemVo;
@@ -37,6 +46,7 @@ import cn.jdcloud.medicine.mall.api.biz.user.service.FootprintService;
 import cn.jdcloud.medicine.mall.api.biz.user.service.UserCollectionService;
 import cn.jdcloud.medicine.mall.api.common.exception.CustomException;
 import cn.jdcloud.medicine.mall.api.common.utils.BeanUtil;
+import cn.jdcloud.medicine.mall.api.constant.Constant;
 import cn.jdcloud.medicine.mall.dao.product.ItemBrandMapper;
 import cn.jdcloud.medicine.mall.dao.product.ItemCategoryMapper;
 import cn.jdcloud.medicine.mall.dao.product.ItemMapper;
@@ -44,12 +54,15 @@ import cn.jdcloud.medicine.mall.dao.product.ItemRecommendMapper;
 import cn.jdcloud.medicine.mall.dao.promotion.PromotionGroupItemMapper;
 import cn.jdcloud.medicine.mall.dao.promotion.PromotionInfoMapper;
 import cn.jdcloud.medicine.mall.domain.admin.Admin;
+import cn.jdcloud.medicine.mall.domain.config.Config;
 import cn.jdcloud.medicine.mall.domain.product.Item;
 import cn.jdcloud.medicine.mall.domain.product.ItemBatch;
 import cn.jdcloud.medicine.mall.domain.product.ItemBrand;
+import cn.jdcloud.medicine.mall.domain.product.ItemBrandDto;
 import cn.jdcloud.medicine.mall.domain.product.ItemCategory;
 import cn.jdcloud.medicine.mall.domain.product.ItemRecommend;
 import cn.jdcloud.medicine.mall.domain.promotion.PromotionInfoDto;
+import cn.jdcloud.medicine.mall.domain.promotion.PromotionItem;
 import cn.jdcloud.medicine.mall.domain.user.UserCollection;
 
 @Service
@@ -57,13 +70,15 @@ public class ItemServiceImpl extends ServiceImpl<ItemMapper, Item> implements It
     @Resource
     private ItemMapper itemMapper;
     @Resource
-    ItemCategoryMapper itemCategoryMapper;
+    private ItemCategoryMapper itemCategoryMapper;
     @Resource
-    ItemBrandMapper itemBrandMapper;
+    private ItemBrandMapper itemBrandMapper;
     @Resource
-    ItemBatchService itemBatchService;
+    private ItemBatchService itemBatchService;
     @Resource
-    AdminService adminService;
+    private CouponService couponService;
+    @Resource
+    private AdminService adminService;
     @Resource
     private ItemRecommendMapper itemRecommendMapper;
     @Resource
@@ -76,6 +91,8 @@ public class ItemServiceImpl extends ServiceImpl<ItemMapper, Item> implements It
     private UserCollectionService userCollectionService;
     @Resource
     private FootprintService footprintService;
+    @Resource
+    private ConfigService configService;
     /**
      * 查询商品推荐列表  1 标识查询首页推荐列表
      */
@@ -363,9 +380,14 @@ public class ItemServiceImpl extends ServiceImpl<ItemMapper, Item> implements It
  		 }
 		 itemVo.setPromotionId(promotionId);
 		 itemVo.setPromotionTag(1);
-
+		 //t_promotion_group_item
 		 //查询团购信息
 		 PromotionInfoDto promotionInfoDto= promotionInfoMapper.queryPromotionInfo(promotionId);
+		
+		 //团购价格
+		 PromotionItem  promotionItem=promotionGroupItemService.promotionItemOne(promotionId, itemNo);
+		 itemVo.setPromotionPrice(promotionItem.getPromotionPrice());
+		 
 		 //状态(0 待支付 1拼团中 2拼团成功 3已取消 4活动结束未成功)
 		 vo.setStatus(changeStatus(promotionInfoDto.getStatus()));
 		// groupCondition 成团条件（1:按参团人数;2:按成交数量）
@@ -421,6 +443,174 @@ public class ItemServiceImpl extends ServiceImpl<ItemMapper, Item> implements It
 	}
 
 
+	@Override
+	public IndexPromotionItemVo queryIndexPromotionItemDetail(Integer userId) {
+		IndexPromotionItemVo indexPromotionItemVo=new IndexPromotionItemVo();
+		Config config=configService.queryByCode(Constant.INDEX_ITEM_PROMOTION);
+		String value=config.getValue();
+		String itemNo=value.split("-")[0];
+		Integer promotionId=Integer.parseInt(value.split("-")[1]);
+		PromotionInfoDto promotionInfoDto= promotionInfoMapper.queryPromotionInfo(promotionId);
+		PromotionItem  promotionItem=promotionGroupItemService.promotionItemOne(promotionId, itemNo);
+		Item item= queryItemByItemNo( itemNo);
+		indexPromotionItemVo.setEffectiveDate(item.getEffectiveDate());
+		indexPromotionItemVo.setImgCover(item.getImgCover());
+		indexPromotionItemVo.setItemName(item.getItemName());
+		indexPromotionItemVo.setItemNo(item.getItemNo());
+		indexPromotionItemVo.setLimitNum(promotionItem.getItemNum());
+		indexPromotionItemVo.setPromotionId(promotionId);
+		indexPromotionItemVo.setPromotionPrice(promotionItem.getPromotionPrice());
+		indexPromotionItemVo.setSoldNum(promotionInfoDto.getItemNum());
+		indexPromotionItemVo.setSurplusTime((promotionInfoDto.getEndTime().getTime()-System.currentTimeMillis())/1000);
+		return indexPromotionItemVo;
+	}
+
+
+	
+	/**
+	 * 查询首页优惠券商品信息
+	 */
+	@Override
+	public List<IndexCouponItemVo> queryIndexCouponItems(Integer userId,int pageNum,int pageSize) {
+		/**
+		 *  1、首先查询所有未过期的优惠券
+		 *  
+		 *  2、解析所有优惠券对应的商品编码 类别编码 品牌编码
+		 *  
+		 *  3、再将第二步的解析作为参数去作为查询条件查询商品表
+		 *  
+		 *  4、最后将查询出来的商品和优惠券进行对应 计算商品的折扣金额
+		 *  
+		 */
+		Page<CouponVo> page=couponService.listCoupon(1, Integer.MAX_VALUE, null, null);
+		List<CouponVo> couponList=page.getRecords();
+		
+		List<String> itemIds=new ArrayList<>();
+		List<String> categoryIds=new ArrayList<>();
+		List<String> brandIds=new ArrayList<>();
+		
+		for(CouponVo  vo:couponList) {
+			//limitType; //限制类型:    1 商品限制  2 品牌限制 3 类别限制
+			Byte limitType=vo.getLimitType();
+			if(limitType==1) {
+				itemIds.addAll(Arrays.asList(vo.getLimitItenIds().split(",")));
+			}
+			else if(limitType==2) {
+				brandIds.addAll(Arrays.asList(vo.getLimitItenIds().split(",")));
+			}
+			else if(limitType==3) {
+				categoryIds.addAll(Arrays.asList(vo.getLimitItenIds().split(",")));
+			}
+		}
+		Page<Item> itemPage=new Page<>();
+		itemPage.setSize(pageSize);
+		itemPage.setCurrent(pageNum);
+		QueryWrapper<Item> queryWrapper =new QueryWrapper<Item>();
+		if(itemIds.size()>0) {
+			queryWrapper.or().in("id", itemIds);
+		}
+		if(categoryIds.size()>0) {
+			queryWrapper.or().in("item_category_id", itemIds);
+		}
+		if(brandIds.size()>0) {
+			queryWrapper.or().in("item_brand_id", itemIds);
+		}
+		itemPage=itemMapper.selectPage(itemPage, queryWrapper);
+		
+		List<Item> items=itemPage.getRecords();
+		List<IndexCouponItemVo> result=new ArrayList<>();
+		for(Item item:items) {
+			IndexCouponItemVo  indexCouponItemVo=new IndexCouponItemVo();
+			BeanUtil.copyProperties(item, indexCouponItemVo);
+			BigDecimal discountPrice=matchingDiscountAmount(couponList,item);
+			indexCouponItemVo.setDiscountPrice(item.getPlatformPrice().subtract(discountPrice));
+			result.add(indexCouponItemVo);
+		}
+		return result;
+	}
+
+
+	/**
+	 * 匹配折扣金额
+	 * @return
+	 */
+	private BigDecimal matchingDiscountAmount(List<CouponVo> couponList,Item item) {
+		//limitType; //限制类型:    1 商品限制  2 品牌限制 3 类别限制
+		BigDecimal finallyPrice=BigDecimal.ZERO;
+		BigDecimal itemPrice=BigDecimal.ZERO;
+		BigDecimal categoryPrice=BigDecimal.ZERO;
+		BigDecimal brandPrice=BigDecimal.ZERO;
+		// 计算某个商品的最大折扣金额
+		for(CouponVo vo:couponList) {
+			List<String> list=new ArrayList<>();
+			list=Arrays.asList(vo.getLimitItenIds().split(","));
+			if(vo.getLimitType()==1&&list.contains(item.getId()+"")
+					&&itemPrice.compareTo(vo.getDiscountAmount())==-1) {
+				itemPrice=vo.getDiscountAmount();
+			}
+			else if(vo.getLimitType()==2&&list.contains(item.getItemBrandId()+"")
+					&&brandPrice.compareTo(vo.getDiscountAmount())==-1) {
+				brandPrice=vo.getDiscountAmount();
+			}
+			else if(vo.getLimitType()==3&&list.contains(item.getItemCategoryId()+"")
+					&&categoryPrice.compareTo(vo.getDiscountAmount())==-1) {
+				categoryPrice=vo.getDiscountAmount();
+			}
+		}
+		
+		if(itemPrice.compareTo(brandPrice)==-1) {
+			finallyPrice=brandPrice;
+		}
+		else {
+			finallyPrice=itemPrice;
+		}
+		
+		if(finallyPrice.compareTo(categoryPrice)==-1) {
+			finallyPrice=categoryPrice;
+		}
+		return finallyPrice;
+	}
+
+
+	@Override
+	public List<ItemVo> listItemsByItemName(String itemName) {
+		List<Item> list=itemMapper.selectList(new QueryWrapper<Item>().like("item_name", itemName));
+		List<ItemVo> voList=new ArrayList<>();
+		for(Item item:list) {
+			ItemVo  itemVo=new ItemVo();
+			itemVo.setId(item.getId());
+			itemVo.setItemNo(item.getItemNo());
+			itemVo.setItemName(item.getItemName());
+			voList.add(itemVo);
+		}
+		return voList;
+	}
+
+
+	@Override
+	public FilterVo queryItemFilterInfo() {
+		//查询商品的所有类别
+		 FilterVo  filterVo=new FilterVo();
+		 List<FilterCategoryVo> categoryList=new ArrayList<>();
+		 List<FilterBrandVo> brandList=new ArrayList<>();;
+		//查询商品的品牌
+		List<ItemBrandDto> list=itemMapper.queryItemBrandInfo();
+		brandList=BeanUtil.copyPropsForList(list, FilterBrandVo.class);
+		
+		QueryWrapper<Item> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("DISTINCT  item_category_id id");
+		List<Map<String, Object>> maps = itemMapper.selectMaps(queryWrapper);
+		List<Integer>categoryIds=new ArrayList<>();
+		for(Map<String, Object> map:maps) {
+			categoryIds.add((Integer)map.get("id"));
+		}
+		List<ItemCategory> categorys=itemCategoryMapper.selectBatchIds(categoryIds);
+		
+		categoryList=BeanUtil.copyPropsForList(categorys, FilterCategoryVo.class);
+		filterVo.setBrandList(brandList);
+		filterVo.setCategoryList(categoryList);
+		return filterVo;
+	}
 
 
 }

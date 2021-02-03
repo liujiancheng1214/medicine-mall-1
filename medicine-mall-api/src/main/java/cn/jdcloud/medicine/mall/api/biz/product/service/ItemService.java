@@ -9,6 +9,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 import cn.jdcloud.medicine.mall.api.biz.product.dto.ItemDto;
 import cn.jdcloud.medicine.mall.api.biz.product.excel.ItemExcel;
+import cn.jdcloud.medicine.mall.api.biz.product.vo.FilterVo;
+import cn.jdcloud.medicine.mall.api.biz.product.vo.IndexCouponItemVo;
+import cn.jdcloud.medicine.mall.api.biz.product.vo.IndexPromotionItemVo;
 import cn.jdcloud.medicine.mall.api.biz.product.vo.ItemDetailVo;
 import cn.jdcloud.medicine.mall.api.biz.product.vo.ItemVo;
 import cn.jdcloud.medicine.mall.api.biz.product.vo.PromotionItemDetailVo;
@@ -17,7 +20,7 @@ import cn.jdcloud.medicine.mall.domain.product.Item;
 
 public interface ItemService extends IService<Item> {
 
-
+	
 	Item  queryItemByItemNo(String itemNo);
 
 	List<ItemVo> listItemRecommend(String itemNo);
@@ -79,4 +82,32 @@ public interface ItemService extends IService<Item> {
 	 */
 	PromotionItemDetailVo queryPromotionItemDetail(Integer userId,String itemNo,Integer promotionId);
 
+    
+	/**
+	 * 查询首页团购信息
+	 * @param userId
+	 * @return
+	 */
+	IndexPromotionItemVo queryIndexPromotionItemDetail(Integer userId);
+	
+	/**
+	 * 查询首页优惠商品信息
+	 * @param userId
+	 * @return
+	 */
+	List<IndexCouponItemVo> queryIndexCouponItems(Integer userId,int pageNum,int PageSize);
+	
+	/**
+	 * 根据商品名称模糊查询
+	 * @param itemName
+	 * @return
+	 */
+	List<ItemVo> listItemsByItemName(String itemName);
+	
+	/**
+	 * 查询商品筛选信息
+	 * @return
+	 */
+	FilterVo  queryItemFilterInfo();
+	
 }

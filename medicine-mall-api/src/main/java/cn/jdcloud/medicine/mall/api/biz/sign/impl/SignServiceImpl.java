@@ -1,5 +1,6 @@
 package cn.jdcloud.medicine.mall.api.biz.sign.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +11,22 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import cn.jdcloud.framework.core.exception.ApiException;
 import cn.jdcloud.framework.utils.DateUtils;
+import cn.jdcloud.medicine.mall.api.biz.config.ConfigService;
+import cn.jdcloud.medicine.mall.api.biz.coupon.service.CouponService;
 import cn.jdcloud.medicine.mall.api.biz.integral.service.IntegralService;
+import cn.jdcloud.medicine.mall.api.biz.product.vo.CouponVo;
 import cn.jdcloud.medicine.mall.api.biz.sign.SignService;
 import cn.jdcloud.medicine.mall.api.biz.sign.code.SignCode;
 import cn.jdcloud.medicine.mall.api.biz.sign.vo.SignVo;
+import cn.jdcloud.medicine.mall.api.common.utils.BeanUtil;
+import cn.jdcloud.medicine.mall.api.constant.Constant;
 import cn.jdcloud.medicine.mall.dao.sign.SignMapper;
+import cn.jdcloud.medicine.mall.dao.user.UserMapper;
+import cn.jdcloud.medicine.mall.domain.config.Config;
+import cn.jdcloud.medicine.mall.domain.coupon.Coupon;
 import cn.jdcloud.medicine.mall.domain.integral.Integral;
 import cn.jdcloud.medicine.mall.domain.sige.Sign;
+import cn.jdcloud.medicine.mall.domain.user.User;
 
 
 @Service
@@ -25,7 +35,13 @@ public class SignServiceImpl implements SignService {
 	 @Autowired
 	 private SignMapper signMapper;
 	 @Autowired
-	 IntegralService  integralService;
+	 private IntegralService  integralService;
+	 @Autowired
+	 private UserMapper userMapper;
+	 @Autowired
+	 private ConfigService configService;
+	 @Autowired
+	 private CouponService couponService;
 	
 	private Sign querySignByUserIdAndDate(Integer userId,String date) {
 		List<Sign>  list=signMapper.selectList(new QueryWrapper<Sign>().eq("user_id", userId)
@@ -110,10 +126,23 @@ public class SignServiceImpl implements SignService {
 			currentDaySignTag=1;
 		}
 		
+	
+		User user=userMapper.selectById(userId);
 		SignVo  signVo=new SignVo();
 		signVo.setContinuityDay(continuityDay);
 		signVo.setCurrentDaySignTag(currentDaySignTag);
 		signVo.setTotalSign(totalSign);
+		signVo.setSignTag(user.getSignTag());
+		
+		//查询签到下面需要展示的优惠券
+		Config  config=configService.queryByCode(Constant.SIGN_COUPON);
+		if(config!=null) {
+			String value=config.getValue();
+			String[] str=value.split(Constant.STR_DIVISION);
+			List<Coupon> couponList=couponService.listByIds(Arrays.asList(str));
+			List<CouponVo> voList=BeanUtil.copyPropsForList(couponList, CouponVo.class);
+			signVo.setCouponList(voList);
+		}
 		return signVo;
 	}
 	
@@ -122,6 +151,13 @@ public class SignServiceImpl implements SignService {
 	@Override
 	public Sign queryCurrentDaySign(Integer userId) {
 		return querySignByUserIdAndDate(userId, DateUtils.today());
+	}
+
+	@Override
+	public void updateUserSignTag(Integer userId, byte signTag) {
+		User user=userMapper.selectById(userId);
+		user.setSignTag(signTag);
+		userMapper.updateById(user);
 	}
 
 }

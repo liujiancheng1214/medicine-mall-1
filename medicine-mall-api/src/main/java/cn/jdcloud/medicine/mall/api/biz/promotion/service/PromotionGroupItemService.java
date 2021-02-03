@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import cn.jdcloud.medicine.mall.api.biz.product.vo.IndexPromotionItemVo;
 import cn.jdcloud.medicine.mall.api.biz.product.vo.ItemVo;
 import cn.jdcloud.medicine.mall.api.biz.promotion.dto.PromotionItemDto;
 import cn.jdcloud.medicine.mall.api.biz.promotion.vo.PromotionItemUserVo;
@@ -29,4 +30,10 @@ public interface PromotionGroupItemService extends IService<PromotionGroupItem> 
     
      // 查询某拼团人员信息
     List<PromotionItemUserVo> listPromotionItemUser(Integer promotionId);
+    
+    // 查询拼团列表 修改了UI 需新增接口
+    // type =0 默认  1热门 2 常购  3 即将拼团
+    List<IndexPromotionItemVo> listPromotionItemVo(Integer userId,int pageNum,int pageSize,String searchValue,int type);
+    
+    
 }

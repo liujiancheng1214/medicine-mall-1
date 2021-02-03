@@ -1,7 +1,7 @@
 package cn.jdcloud.medicine.mall.api.biz.product.service.impl;
 
 import cn.jdcloud.medicine.mall.api.biz.product.service.ProductService;
-import cn.jdcloud.medicine.mall.api.biz.product.vo.ProductListVO;
+import cn.jdcloud.medicine.mall.api.biz.product.vo.ProductListVo;
 import cn.jdcloud.medicine.mall.dao.product.ItemMapper;
 import cn.jdcloud.medicine.mall.dao.product.ProductMapper;
 import cn.jdcloud.medicine.mall.domain.product.Item;
@@ -27,7 +27,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper,Product> imple
     @Resource
     private ItemMapper itemMapper;
 	@Override
-	public Page<ProductListVO> page(Page<Item> page, QueryWrapper<Item> queryWrapper) {
+	public Page<ProductListVo> page(Page<Item> page, QueryWrapper<Item> queryWrapper) {
 		  Page<Item> itemPage = itemMapper.selectPage(page, queryWrapper);
 		  
 		  

@@ -31,7 +31,7 @@ public class CarRest {
 	}
 
 	@ApiOperation(value = "删除购物车,返回1 删除成功")
-	@PostMapping(value = "/deleteCar")
+	@GetMapping(value = "/deleteCar")
 	public ApiResult<Integer> deleteCar(@RequestHeader("token") String token,Integer carId) {
 		Integer userId=userContextUtil.tokenToUserId(token);
 		int i=carService.deleteCar(userId, carId);

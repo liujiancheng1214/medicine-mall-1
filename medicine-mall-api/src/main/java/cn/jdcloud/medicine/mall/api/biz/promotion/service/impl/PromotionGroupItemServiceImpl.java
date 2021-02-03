@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import cn.jdcloud.medicine.mall.api.biz.product.vo.IndexPromotionItemVo;
 import cn.jdcloud.medicine.mall.api.biz.product.vo.ItemVo;
 import cn.jdcloud.medicine.mall.api.biz.promotion.dto.PromotionItemDto;
 import cn.jdcloud.medicine.mall.api.biz.promotion.service.PromotionGroupItemService;
@@ -81,12 +82,13 @@ implements PromotionGroupItemService {
 	 */
 	@Override
 	public List<ItemVo> listPromotionItems(String itemName, String itemBrandName, Integer sortType) {
-		List<PromotionItemListDto>list=promotionGroupItemMapper.listPromotionItems(null, itemName, itemBrandName, sortType, null);
-		List<ItemVo>  voList=new ArrayList<>();
-		for(PromotionItemListDto dto:list) {
-			voList.add(new ItemVo(dto) );
-		}
-		return voList;
+//		List<PromotionItemListDto>list=promotionGroupItemMapper.listPromotionItems(null, itemName, itemBrandName, sortType, null);
+//		List<ItemVo>  voList=new ArrayList<>();
+//		for(PromotionItemListDto dto:list) {
+//			voList.add(new ItemVo(dto) );
+//		}
+//		return voList;
+		return null;
 	}
 
 	@Override
@@ -124,5 +126,26 @@ implements PromotionGroupItemService {
 			long hour=sub/(3600*60);
 			return hour+"小时以前";
 		}
+	}
+
+	@Override
+	public List<IndexPromotionItemVo> listPromotionItemVo(Integer userId, int pageNum, int pageSize,String searchValue, int type) {
+		List<PromotionItemListDto>list=promotionGroupItemMapper.listPromotionItems(null,null,null,null);
+		List<IndexPromotionItemVo> voList=new ArrayList<>();
+		for(PromotionItemListDto  dto:list) {
+			IndexPromotionItemVo itemVo=new IndexPromotionItemVo();
+			BeanUtil.copyProperties(dto, itemVo);
+			itemVo.setEffectiveDate(dto.getEffectiveDate());
+			itemVo.setImgCover(dto.getImgCover());
+			itemVo.setItemName(dto.getItemName());
+			itemVo.setItemNo(dto.getItemNo());
+			itemVo.setLimitNum(dto.getLimitNum());
+			itemVo.setPromotionId(dto.getPromotionId());
+			itemVo.setPromotionPrice(dto.getItemGroupPrice());
+			itemVo.setSoldNum(dto.getSoldNum());
+			itemVo.setSurplusTime(dto.getEndTime().getTime()-System.currentTimeMillis()/1000);
+			voList.add(itemVo);
+		}
+		return voList;
 	}
 }

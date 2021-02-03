@@ -15,6 +15,6 @@ public class ProductQueryParam {
 	private Integer itemBrandId;
 	@ApiModelProperty(value="排序方式  1：价格升序 2 价格降序  3 有效期升序 4 有效期降序")
 	private Integer sortType;
-	@ApiModelProperty(value="关键字搜索")
+	@ApiModelProperty(value="关键字搜索（商品名称）")
 	private String searchValue;
 }

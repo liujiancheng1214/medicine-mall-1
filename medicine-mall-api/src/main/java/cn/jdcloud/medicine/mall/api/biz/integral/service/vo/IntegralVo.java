@@ -4,23 +4,23 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
 public class IntegralVo {
 	private Integer id;
-
+	@ApiModelProperty(value="积分数量")
     private Integer amount;
-
-    private String reamrk;
-
+    @ApiModelProperty(value="积分类型")
     private String type;
-
-    private Integer userId;
-    @JsonFormat(pattern="yyyy-MM-dd",timezone="GMT+8")
-    private Date createTime;
-
+    @ApiModelProperty(value="积分类型描述")
     private String typeDesc;
-
+    private Integer userId;
+    @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss",timezone="GMT+8")
+    private Date createTime;
+    @ApiModelProperty(value="1 获得积分  0 使用积分")
     private Integer changeType;
+    @ApiModelProperty(value="备注")
+    private String reamrk;
 }

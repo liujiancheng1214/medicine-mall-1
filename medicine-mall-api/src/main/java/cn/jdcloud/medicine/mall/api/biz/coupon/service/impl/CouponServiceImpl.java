@@ -60,9 +60,12 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon>  implem
 		QueryWrapper<Coupon> queryWrapper =new QueryWrapper<Coupon>();
 		// 过滤条件  时间过期  用户已经领取
 		// 用户已经领取过的优惠券Id
-		List<Integer> couponIds=couponRecordService.userCouponRecordIds(userId);
+		List<Integer> couponIds=null;
+		if(userId!=null) {
+			couponIds=couponRecordService.userCouponRecordIds(userId);
+		}
 		// 优惠券的过期时间 
-		queryWrapper.lt("expire_time", DateUtils.formatDate(new Date(), "yyyy-mm-dd"));
+		queryWrapper.gt("expire_time", DateUtils.formatDate(new Date(), "yyyy-MM-dd"));
 		queryWrapper.notIn(couponIds!=null&&couponIds.size()>0, "id", couponIds);
 		queryWrapper.eq(limitType != null, "limit_type", limitType);
 		
