@@ -108,7 +108,7 @@ public class ItemBrandServiceImpl extends ServiceImpl<ItemBrandMapper, ItemBrand
 		if(StringUtils.isNotBlank(searchValue)) {
 			wrapper.like("ibrand_name", searchValue);
 		}
-		wrapper.orderByAsc("sort");
+	     wrapper.orderByAsc("sort");
 		 itemBrandPage=this.page(itemBrandPage, wrapper);
 		 List<ItemBrandVo> voList=new ArrayList<>();
 		 Page<ItemBrandVo>  itemBrandVo=new Page<ItemBrandVo>();

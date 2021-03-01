@@ -130,6 +130,10 @@ implements PromotionGroupItemService {
 
 	@Override
 	public List<IndexPromotionItemVo> listPromotionItemVo(Integer userId, int pageNum, int pageSize,String searchValue, int type) {
+		/**
+		 * TODO 缺少Tpye 类型判断
+		 */
+		
 		List<PromotionItemListDto>list=promotionGroupItemMapper.listPromotionItems(null,null,null,null);
 		List<IndexPromotionItemVo> voList=new ArrayList<>();
 		for(PromotionItemListDto  dto:list) {

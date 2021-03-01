@@ -15,21 +15,38 @@
          order by b.create_time desc
   </select>
 
-
+           <!-- 查询团购商品列表 -->
   <select id="listPromotionItems"  resultType="cn.jdcloud.medicine.mall.domain.promotion.PromotionItemListDto">
-    select  aa.*, ifnull(dd.item_num,0)  sold_num,  ifnull(dd.user_num,0) sold_user_num from(
-      select  
-      a.promotion_id , c.id  item_id, 
-       a.item_num limit_num,
-      c.item_no,c.item_name,c.img_cover , b.end_time ,
-      c.subtotal_sale_num, a.item_group_price,
-      c.effective_date ,c.factory ,c.retail_price retail_price
-    from  
-      t_promotion_group_item a,t_promotion_info b,t_item  c
-    where a.promotion_id=b.promotion_id and a.item_no=c.item_no 
-    and b.end_time>now()  and b.status=1 and b.is_deleted=0
+      select  aa.*, 
+              ifnull(dd.item_num,0) sold_num,  
+              ifnull(dd.user_num,0) sold_user_num 
+      from
+      (
+         select  
+                a.promotion_id , 
+                c.id  item_id, 
+                a.item_num limit_num,
+                c.item_no,
+                c.item_name,
+                c.img_cover,
+                b.end_time,
+                c.subtotal_sale_num, 
+                a.item_group_price,
+                c.effective_date ,
+                c.factory,
+                c.retail_price retail_price
+             from  
+                t_promotion_group_item a,
+                t_promotion_info b,
+                t_item  c
+            where 
+                a.promotion_id=b.promotion_id 
+                and a.item_no=c.item_no 
+                and b.status=1 
+                and now()  BETWEEN b.begin_time and b.end_time
+                and b.is_deleted=0
     <if test="promotionIds != null and promotionIds != ''">
-       and  a.promotion_id in
+              and  a.promotion_id in
         <foreach item="item" collection="promotionIds" separator="," open="(" close=")" index="">
              #{item}
      </foreach>
@@ -47,8 +64,13 @@
         select  id  from t_item_brand where ibrand_name like '%${itemBrandName}%')
         )
      </if>
-     )aa left join t_group_info dd
-      on aa.promotion_id=dd.promotion_id and aa.item_no=dd.item_no
+       )aa 
+        left join
+          t_group_info dd
+        on 
+          aa.promotion_id=dd.promotion_id 
+          and aa.item_no=dd.item_no
+          and dd.status=1   <!-- 只查询拼团中状态的记录 -->
   </select>
 
   <select id="checkItemIsPromotionItem" resultType="int">

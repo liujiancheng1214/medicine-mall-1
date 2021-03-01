@@ -1,6 +1,5 @@
 package cn.jdcloud.medicine.mall.api.controller;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

@@ -95,10 +95,10 @@ public class OrderPayPageServiceImpl implements OrderPayPageService {
 		}
 		
 		pageItemVo.setRetailPrice(itemVo.getRetailPrice());
-		BigDecimal totalItemFee =null;
+		BigDecimal totalItemFee = null;
 		if(promotionTag==0) {
 			ItemBatch itemBatch = itemBatchService.queryItemBatchBySkuAndItemNo(sku, itemNO);
-			 totalItemFee = itemBatch.getPrice().multiply(new BigDecimal(num));
+			totalItemFee = itemBatch.getPrice().multiply(new BigDecimal(num));
 			pageItemVo.setPlatformPrice(itemBatch.getPrice());
 			pageItemVo.setSku(sku);
 			pageItemVo.setItemBatchNo(itemBatch.getBatchNo());
@@ -119,7 +119,7 @@ public class OrderPayPageServiceImpl implements OrderPayPageService {
 			pageItemVo.setPlatformPrice(promotionItem.getPromotionPrice());
 			pageItemVo.setNum(promotionItem.getItemNum()*num);
 			totalItemFee=promotionItem.getPromotionPrice().multiply(new BigDecimal(pageItemVo.getNum()));
-			// 价格采用拼团价格  自己发起拼团
+			// 价格采用拼团价格  自己发起拼团 活动只能由后台发起 暂时屏蔽
 		/*	if(groupInfoId==null) {
 				PromotionInfo promotionInfo=promotionInfoMapper.selectById(promotionId);
 				GroupInfo groupInfo=new GroupInfo();
@@ -159,13 +159,19 @@ public class OrderPayPageServiceImpl implements OrderPayPageService {
 			}*/
 		}
 		 // 运费
-		 vo.setTransportFee(new BigDecimal(10));
+		 vo.setTransportFee(BigDecimal.ZERO);
 		 vo.setTotalItemFee(totalItemFee);
 		 BigDecimal totalFee = totalItemFee.add(vo.getTransportFee());
 		 vo.setTotalFee(totalFee);
 		 return vo;
 	}
 
+	/**
+	 * 判断当前商品是否有优惠券可用
+	 * @param userId
+	 * @param list
+	 * @return
+	 */
 	private int couponTag(Integer userId, List<ItemNumVo> list) {
 		 List<CouponVo> couponVoList=couponRecordService.listCouponRecordByUserIdAndItemNos(userId, list);
 		 if(couponVoList!=null&&couponVoList.size()>0) {
@@ -189,7 +195,7 @@ public class OrderPayPageServiceImpl implements OrderPayPageService {
 		OrderPayPageVO  orderPayPageVO=new OrderPayPageVO();
 	    List<Car>cars=	carMapper.selectList(new QueryWrapper<Car>().in("id", carIds).eq("user_id", userId));
 	    List<PageItemVo> pageItemList=new ArrayList<>();
-	    BigDecimal totalItemFee = new BigDecimal(0);
+	    BigDecimal totalItemFee =  BigDecimal.ZERO;
 	    
 	    List<ItemNumVo> list=new ArrayList<>();
 	    

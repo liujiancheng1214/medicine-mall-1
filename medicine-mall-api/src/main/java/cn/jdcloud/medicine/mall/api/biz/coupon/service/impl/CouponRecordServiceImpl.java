@@ -142,7 +142,7 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
 	@Override
 	public List<CouponVo> listCouponRecordByUserIdAndItemNos(Integer userId, List<ItemNumVo> list) {
 		// 计算出总金额
-		BigDecimal totalPrice = new BigDecimal(0);
+		BigDecimal totalPrice = BigDecimal.ZERO;
 		// 所有的类别
 		List<Integer> categoryIds = new ArrayList<>();
 		// 所有的品牌
@@ -165,7 +165,7 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
 			itemIds.add(itemVo.getId());
 		}
 		// 先查询有效的优惠券列表
-		UserCouponVo userCouponVo = listCouponRecordByUserIdAndStatus(userId, 1 + "");
+		UserCouponVo userCouponVo = listCouponRecordByUserIdAndStatus(userId, "1");
 		List<CouponVo> kyList = userCouponVo.getKyList();
 		// 根据ItemNos 进一步筛选
 		List<CouponVo> filterList=new ArrayList<>();
